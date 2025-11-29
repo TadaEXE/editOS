@@ -5,16 +5,16 @@ namespace gfx {
 Rect& Rect::operator-=(int32_t t) {
   x += t;
   y += t;
-  w -= t;
-  h -= t;
+  w -= 2 * t;
+  h -= 2 * t;
   return *this;
 }
 
 Rect& Rect::operator+=(int32_t t) {
   x -= t;
   y -= t;
-  w += t;
-  h += t;
+  w += 2 * t;
+  h += 2 * t;
   return *this;
 }
 

@@ -1,8 +1,10 @@
 #pragma once
 #include <cstdint>
+
 #include "gfx/canvas.hpp"
+#include "gfx/color.hpp"
 #include "gfx/shapes.hpp"
-#include "ui/widget.hpp"
+#include "ui/core/widget.hpp"
 
 namespace ui {
 
@@ -18,8 +20,8 @@ class Window : public Widget {
  private:
   gfx::Rect rect;
 
-  uint32_t bg_color{0xFF303030};
-  uint32_t border_color{0xFF101010};
+  gfx::Color bg_color{gfx::Color::Gray()};
+  gfx::Color border_color{gfx::Color::Black()};
   uint32_t border_thickness{5};
 };
 }  // namespace ui

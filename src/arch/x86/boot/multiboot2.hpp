@@ -2,18 +2,52 @@
 
 #include <cstdint>
 
+#include "kernel/data_structures/flatmap.hpp"
+
 namespace x86::multiboot2 {
 
-struct Tag {
-  uint32_t type;
+enum class TagType : uint32_t {
+  End = 0,
+
+  Cmdline = 1,
+  BootloaderName = 2,
+  Module = 3,
+  BasicMeminfo = 4,
+  BootDevice = 5,
+  Mmap = 6,
+  Vbe = 7,
+  Framebuffer = 8,
+  ElfSections = 9,
+  Apm = 10,
+
+  Efi32SystemTable = 11,
+  Efi64SystemTable = 12,
+
+  Smbios = 13,
+  AcpiV1RsdPtr = 14,
+  AcpiV2RsdPtr = 15,
+
+  Network = 16,
+  EfiMemoryMap = 17,
+  EfiBootServicesNotTerminated = 18,
+
+  Efi32ImageHandle = 19,
+  Efi64ImageHandle = 20,
+
+  ImageLoadBaseAddress = 21
+
+};
+
+constexpr size_t TAG_COUNT = 22;
+
+struct __attribute__((packed)) Tag {
+  TagType type;
   uint32_t size;
 };
 
-inline constexpr uint32_t TAG_TYPE_END = 0;
-inline constexpr uint32_t TAG_TYPE_FRAMEBUFFER = 8;
-
 struct __attribute__((packed)) FramebufferTag {
-  uint32_t type;
+
+  TagType type;
   uint32_t size;
   uint64_t addr;
   uint32_t pitch;
@@ -33,6 +67,15 @@ struct FramebufferInfo {
   uint8_t type_fb;
 };
 
-bool find_framebuffer(uint32_t mb2_info_addr, FramebufferInfo& out);
+struct __attribute__((packed)) StringOnlyTag {
+  TagType type;
+  uint32_t size;
+  char str[];
+};
+
+ds::FlatMap<TagType, Tag*, TAG_COUNT>& get_tag_map(uint32_t mb2_info_addr = 0x0) noexcept;
+bool get_boot_framebuffer(FramebufferInfo& out, uint32_t mb2_info_addr = 0x0);
+bool get_cmdline(const char** cmdline, uint32_t mb2_info_addr = 0x0);
+bool get_bootloader_name(const char** bootloader_name, uint32_t mb2_info_addr = 0x0);
 
 }  // namespace x86::multiboot2

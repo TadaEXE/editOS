@@ -9,27 +9,49 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 enable_language(ASM)
 
-# All kernel sources (add more here as you create them)
-set(KERNEL_SOURCES
-    ${CMAKE_SOURCE_DIR}/src/boot.s
-    ${CMAKE_SOURCE_DIR}/src/kernel/main.cpp
-    ${CMAKE_SOURCE_DIR}/src/hw/console/text_mode_console.cpp
-    ${CMAKE_SOURCE_DIR}/src/hw/peripherals/keyboard.cpp
-    ${CMAKE_SOURCE_DIR}/src/input/editor.cpp
-    ${CMAKE_SOURCE_DIR}/src/memory/heap.cpp
-    ${CMAKE_SOURCE_DIR}/src/hw/boot/multiboot2.cpp
-    ${CMAKE_SOURCE_DIR}/src/hw/graphics/framebuffer.cpp
-    ${CMAKE_SOURCE_DIR}/src/hw/io/serial.cpp
-    ${CMAKE_SOURCE_DIR}/src/gfx/canvas.cpp
-    ${CMAKE_SOURCE_DIR}/src/gfx/shapes.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/window.cpp
-    ${CMAKE_SOURCE_DIR}/src/logging/serial_logging.cpp
-    ${CMAKE_SOURCE_DIR}/src/abi/icxx_guard.cpp
-    ${CMAKE_SOURCE_DIR}/src/abi/icxx_pure_virtual.cpp
+set(ARCH "x86" CACHE STRING "Target architecture (e.g. x86, x86_64)")
+
+set(ARCH_SOURCES
+    ${CMAKE_SOURCE_DIR}/src/arch/${ARCH}/boot/boot.s
+    ${CMAKE_SOURCE_DIR}/src/arch/${ARCH}/boot/entry_point.cpp
+    ${CMAKE_SOURCE_DIR}/src/arch/${ARCH}/boot/multiboot2.cpp
+
+    # ${CMAKE_SOURCE_DIR}/src/arch/${ARCH}/console/text_mode_console.cpp
+
+    ${CMAKE_SOURCE_DIR}/src/arch/${ARCH}/graphics/framebuffer.cpp
+
+    ${CMAKE_SOURCE_DIR}/src/arch/${ARCH}/input/keyboard.cpp
+
+    ${CMAKE_SOURCE_DIR}/src/arch/${ARCH}/io/serial.cpp
 )
 
+set(KERNEL_SOURCES
+    ${CMAKE_SOURCE_DIR}/src/kernel/main.cpp
+
+    ${CMAKE_SOURCE_DIR}/src/kernel/memory/heap.cpp
+
+    ${CMAKE_SOURCE_DIR}/src/kernel/abi/icxx/atexit.cpp
+    ${CMAKE_SOURCE_DIR}/src/kernel/abi/icxx/guard.cpp
+    ${CMAKE_SOURCE_DIR}/src/kernel/abi/icxx/pure_virtual.cpp
+    ${CMAKE_SOURCE_DIR}/src/kernel/abi/gcc/int_arithmetic.cpp
+
+    ${CMAKE_SOURCE_DIR}/src/kernel/logging/logging.cpp
+
+    # ${CMAKE_SOURCE_DIR}/src/apps/editor/editor.cpp
+
+    ${CMAKE_SOURCE_DIR}/src/gfx/canvas.cpp
+    ${CMAKE_SOURCE_DIR}/src/gfx/shapes.cpp
+    ${CMAKE_SOURCE_DIR}/src/gfx/text/text.cpp
+    ${CMAKE_SOURCE_DIR}/src/gfx/text/bitmap_font.cpp
+
+    ${CMAKE_SOURCE_DIR}/src/ui/core/window.cpp
+
+    ${CMAKE_SOURCE_DIR}/src/hal/keyboard.cpp
+
+    ${CMAKE_SOURCE_DIR}/src/input/keymap_us.cpp
+)
 # Object library that builds all kernel sources
-add_library(kernel_obj OBJECT ${KERNEL_SOURCES})
+add_library(kernel_obj OBJECT ${KERNEL_SOURCES} ${ARCH_SOURCES})
 
 # Allow #include "hw/console.hpp" etc.
 target_include_directories(kernel_obj PUBLIC
@@ -90,5 +112,13 @@ add_custom_command(
 # Default target: build the ISO
 add_custom_target(iso ALL DEPENDS ${ISO_FILE})
 
-# Optional: build just the kernel ELF with `cmake --build . --target kernel`
+add_custom_target(run
+    COMMAND qemu-system-i386
+            -cdrom ${ISO_FILE}
+            -chardev vc,id=serialgui,logfile=serial.log,logappend=on
+            -serial chardev:serialgui
+            -display gtk,zoom-to-fit=on
+    DEPENDS iso
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)
 

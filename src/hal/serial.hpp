@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <optional>
 
 namespace hal {
 
@@ -12,6 +11,8 @@ enum class SerialPort : uint32_t {
 
 class SerialBus {
  public:
+  virtual ~SerialBus() = default;
+
   virtual void init() noexcept = 0;
   virtual void write_char(char c) noexcept = 0;
   virtual void write_string(const char* s) noexcept = 0;

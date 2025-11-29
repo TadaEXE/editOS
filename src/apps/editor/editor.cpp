@@ -1,6 +1,5 @@
 #include "apps/editor/editor.hpp"
-#include "ui/core/iconsole.hpp"
-#include "hw/peripherals/keyboard.hpp"
+#include "hal/keyboard.hpp"
 
 #include <cstdint>
 

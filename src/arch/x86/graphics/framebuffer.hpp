@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include "arch/x86/boot/multiboot2.hpp"
+#include "gfx/color.hpp"
 #include "hal/framebuffer.hpp"
 
 namespace x86::graphics {
@@ -19,14 +20,12 @@ class Framebuffer : public hal::Framebuffer {
         bpp(info.bpp),
         type_fb(info.type_fb) {}
 
-  void init(const multiboot2::FramebufferInfo& info);
-
   bool valid() const noexcept override {
     return addr != nullptr && bpp == 32 && width > 0 && height > 0 && pitch >= width * 4;
   }
 
-  void clear(uint32_t argb) noexcept override;
-  void put_pixel(uint32_t x, uint32_t y, uint32_t argb) noexcept override;
+  void clear(gfx::Color color) noexcept override;
+  void put_pixel(uint32_t x, uint32_t y, gfx::Color color) noexcept override;
 
   uint32_t get_width() const noexcept override { return width; }
 
