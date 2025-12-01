@@ -1,12 +1,12 @@
 #pragma once
 #include <optional>
 
-#include "boot_context.hpp"
+#include "kernel/boot/boot_context.hpp"
 #include "hal/framebuffer.hpp"
 
 namespace hal {
 
-void enter_kernel(hal::BootContext& ctx);
+[[noreturn]] void enter_kernel(boot::BootContext& ctx);
 
 std::optional<Framebuffer> get_boot_framebuffer();
 

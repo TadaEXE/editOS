@@ -5,13 +5,13 @@
 
 namespace gfx {
 
-struct Line : public log::Loggable {
+struct Line : public logging::Loggable {
   uint32_t s;
   uint32_t e;
   uint32_t w;
 };
 
-struct Rect : public log::Loggable {
+struct Rect : public logging::Loggable {
   uint32_t x;
   uint32_t y;
   uint32_t w;
@@ -36,7 +36,7 @@ struct Rect : public log::Loggable {
   static constexpr const char* fmt() noexcept { return "{x=%u, y=%u, w=%u, h=%u}"; }
 
   /// Inclusive start, exclusive end: [x, x+w), [y, y+h)
-  constexpr bool is_inbounds(uint32_t px, uint32_t py) const noexcept {
+  constexpr bool is_inbounds(uint32_t px, uint32_t py) const {
     return (px >= x && px < x + w) && (py >= y && py < y + h);
   }
 };

@@ -29,5 +29,8 @@ SECTIONS
         *(.bss*)
         *(COMMON)
     }
+
+    . = ALIGN(4K);
+    _ld_kernel_end_addr = .;
 }
 

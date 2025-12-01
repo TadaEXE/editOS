@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include "arch/x86/boot/multiboot2.hpp"
+#include "kernel/boot/multiboot2.hpp"
 #include "gfx/color.hpp"
 #include "hal/framebuffer.hpp"
 
@@ -12,7 +12,7 @@ class Framebuffer : public hal::Framebuffer {
  public:
   Framebuffer() = default;
 
-  explicit Framebuffer(const multiboot2::FramebufferInfo& info)
+  explicit Framebuffer(const mb2::FramebufferTag& info)
       : addr(reinterpret_cast<uint8_t*>(static_cast<uintptr_t>(info.addr))),
         pitch(info.pitch),
         width(info.width),

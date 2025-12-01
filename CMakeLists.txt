@@ -14,7 +14,6 @@ set(ARCH "x86" CACHE STRING "Target architecture (e.g. x86, x86_64)")
 set(ARCH_SOURCES
     ${CMAKE_SOURCE_DIR}/src/arch/${ARCH}/boot/boot.s
     ${CMAKE_SOURCE_DIR}/src/arch/${ARCH}/boot/entry_point.cpp
-    ${CMAKE_SOURCE_DIR}/src/arch/${ARCH}/boot/multiboot2.cpp
 
     # ${CMAKE_SOURCE_DIR}/src/arch/${ARCH}/console/text_mode_console.cpp
 
@@ -28,13 +27,15 @@ set(ARCH_SOURCES
 set(KERNEL_SOURCES
     ${CMAKE_SOURCE_DIR}/src/kernel/main.cpp
 
-    ${CMAKE_SOURCE_DIR}/src/kernel/memory/heap.cpp
+    ${CMAKE_SOURCE_DIR}/src/kernel/memory/bm_heap.cpp
+    ${CMAKE_SOURCE_DIR}/src/kernel/memory/global_hooks.cpp
 
     ${CMAKE_SOURCE_DIR}/src/kernel/abi/icxx/atexit.cpp
     ${CMAKE_SOURCE_DIR}/src/kernel/abi/icxx/guard.cpp
     ${CMAKE_SOURCE_DIR}/src/kernel/abi/icxx/pure_virtual.cpp
     ${CMAKE_SOURCE_DIR}/src/kernel/abi/gcc/int_arithmetic.cpp
-
+    ${CMAKE_SOURCE_DIR}/src/kernel/boot/multiboot2.cpp
+    ${CMAKE_SOURCE_DIR}/src/kernel/runtime/memory.cpp
     ${CMAKE_SOURCE_DIR}/src/kernel/logging/logging.cpp
 
     # ${CMAKE_SOURCE_DIR}/src/apps/editor/editor.cpp
@@ -49,6 +50,7 @@ set(KERNEL_SOURCES
     ${CMAKE_SOURCE_DIR}/src/hal/keyboard.cpp
 
     ${CMAKE_SOURCE_DIR}/src/input/keymap_us.cpp
+
 )
 # Object library that builds all kernel sources
 add_library(kernel_obj OBJECT ${KERNEL_SOURCES} ${ARCH_SOURCES})
@@ -71,6 +73,7 @@ target_compile_options(kernel_obj PRIVATE
         -O2
         -Wall
         -Wextra
+        -std=c++20
     >
     $<$<COMPILE_LANGUAGE:ASM>:
         -m32

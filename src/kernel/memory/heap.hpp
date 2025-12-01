@@ -1,19 +1,27 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
+
+#include "kernel/memory/byte_conversion.hpp"
 
 namespace memory {
 
-/// Very simple bump allocator.
-///
-/// - Grows forward inside a fixed-size buffer
-/// - Never frees (until reboot)
-/// - Returns nullptr on OOM (global new will just spin then)
+static constexpr uintptr_t align_up(uintptr_t v, size_t align) noexcept {
+  return (v + align - 1) & ~(static_cast<uintptr_t>(align) - 1);
+}
+
+class Heap {
+ public:
+  virtual ~Heap() = default;
+  virtual void* alloc(size_t size, size_t align = alignof(max_align_t)) noexcept = 0;
+  virtual void free(void* ptr) noexcept = 0;
+};
+
+void init_heap(uintptr_t start, size_t size = 32 * MiB) noexcept;
+
 void* alloc(size_t size, size_t align = alignof(max_align_t)) noexcept;
 
-void free(void* /*ptr*/) noexcept;  // currently a no-op
-
-/// Optional: reset heap to empty (not used yet, but handy for tests)
-void reset() noexcept;
+void free(void* ptr) noexcept;
 
 }  // namespace memory
