@@ -1,0 +1,33 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 23,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default configure",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "build",
+      "displayName": "Build kernel + ISO",
+      "configurePreset": "default"
+    },
+    {
+      "name": "build-and-run",
+      "displayName": "Build and run in QEMU",
+      "configurePreset": "default",
+      "targets": [ "run" ]
+    }
+  ]
+}
+

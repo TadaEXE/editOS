@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include "gfx/canvas.hpp"
 #include "gfx/shapes.hpp"
 #include "gfx/text/text.hpp"
@@ -5,6 +7,7 @@
 #include "hal/keyboard.hpp"
 #include "input/keymap_us.hpp"
 #include "kernel/log.hpp"
+#include "kernel/memory/builtin/bm_heap.hpp"
 #include "kernel/memory/byte_conversion.hpp"
 #include "kernel/memory/heap.hpp"
 #include "kernel/panic.hpp"
@@ -40,6 +43,8 @@ void setup_logging(boot::BootContext& ctx) {
   log_msg("Booted by %s", ctx.bootloader_name);
   log_msg("Bootoptions: %s", ctx.cmdline);
   log_msg("%d KiB available in upper memory", ctx.upper_mem_kb);
+  log_msg("Kernel size %d KiB (~%d%%)", ctx.ram_start_addr - ctx.upper_mem_start,
+          ((ctx.ram_start_addr - ctx.upper_mem_start) * 100) / ctx.upper_mem_kb);
 
   if (ctx.memory_map && ctx.memory_regions) {
     log_msg("Found memory map (%d entries):", ctx.memory_regions);
@@ -48,7 +53,10 @@ void setup_logging(boot::BootContext& ctx) {
       log_msg("  %d MiB at %x [%s]", memory::B_to_MiB(e.length), e.addr,
               boot::MemoryRegionTypeName(e.type));
     }
-    memory::init_heap(ctx.ram_start_addr, 32 * memory::MiB);
+
+    auto* kernel_heap = memory::get_heap<memory::builtin::BmHeap>();
+    memory::init_heap(kernel_heap, ctx.ram_start_addr, 32 * memory::MiB);
+    memory::set_kernel_heap(*kernel_heap);
     log_msg("Kernel heap (%d MiB) initialized at %p", 32, ctx.ram_start_addr);
   }
 
@@ -67,12 +75,18 @@ void setup_logging(boot::BootContext& ctx) {
   gfx::text::TextRenderer tr{can, style};
   tr.set_pos(200, 200);
 
+  char* buf;
+  buf = new char[5]();
+  if (!buf) panic("Fail");
+  memset(buf, 'a', 5);
+
   auto& kb = hal::keyboard();
   for (;;) {
     hal::KeyEvent ev{};
     if (kb.poll(ev)) {
       char c;
       if (input::key_event_to_char(ev, c)) { tr.draw_glyph(c); }
+      log_msg("Buffer: %s", buf);
     }
   }
 }

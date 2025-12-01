@@ -27,8 +27,9 @@ set(ARCH_SOURCES
 set(KERNEL_SOURCES
     ${CMAKE_SOURCE_DIR}/src/kernel/main.cpp
 
-    ${CMAKE_SOURCE_DIR}/src/kernel/memory/bm_heap.cpp
+    ${CMAKE_SOURCE_DIR}/src/kernel/memory/builtin/bm_heap.cpp
     ${CMAKE_SOURCE_DIR}/src/kernel/memory/global_hooks.cpp
+    ${CMAKE_SOURCE_DIR}/src/kernel/memory/heap.cpp
 
     ${CMAKE_SOURCE_DIR}/src/kernel/abi/icxx/atexit.cpp
     ${CMAKE_SOURCE_DIR}/src/kernel/abi/icxx/guard.cpp
