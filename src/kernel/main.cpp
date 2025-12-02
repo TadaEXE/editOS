@@ -39,6 +39,7 @@ void setup_logging(boot::BootContext& ctx) {
   if (!kernel_fuse()) panic("Entry fuse blew");
 
   setup_logging(ctx);
+  log_msg("fb alignment %d", alignof(hal::Framebuffer));
   log_msg("editOS kernel entered...");
   log_msg("Booted by %s", ctx.bootloader_name);
   log_msg("Bootoptions: %s", ctx.cmdline);
@@ -50,13 +51,13 @@ void setup_logging(boot::BootContext& ctx) {
     log_msg("Found memory map (%d entries):", ctx.memory_regions);
     for (size_t i = 0; i < ctx.memory_regions; ++i) {
       auto e = ctx.memory_map[i];
-      log_msg("  %d MiB at %x [%s]", memory::B_to_MiB(e.length), e.addr,
+      log_msg("  %d MiB at %x [%s]", mem::B_to_MiB(e.length), e.addr,
               boot::MemoryRegionTypeName(e.type));
     }
 
-    auto* kernel_heap = memory::get_heap<memory::builtin::BmHeap>();
-    memory::init_heap(kernel_heap, ctx.ram_start_addr, 32 * memory::MiB);
-    memory::set_kernel_heap(*kernel_heap);
+    auto* kernel_heap = mem::get_heap<mem::builtin::BmHeap>();
+    mem::init_heap(kernel_heap, ctx.ram_start_addr, 32 * mem::MiB);
+    mem::set_kernel_heap(*kernel_heap);
     log_msg("Kernel heap (%d MiB) initialized at %p", 32, ctx.ram_start_addr);
   }
 

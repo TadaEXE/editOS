@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace memory {
+namespace mem {
 
 enum class SeekType {
   Forward,
@@ -70,4 +70,4 @@ class DataView {
   size_t pos{0};
 };
 
-}  // namespace memory
+}  // namespace mem

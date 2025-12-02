@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace memory {
+namespace mem {
 
 namespace {
 constexpr size_t HEAP_SIZE = 1024 * 1024;
@@ -47,5 +47,5 @@ void reset() noexcept {
 }
 
 
-}  // namespace memory
+}  // namespace mem
 

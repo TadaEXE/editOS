@@ -64,6 +64,7 @@ target_include_directories(kernel_obj PUBLIC
 # Per-language compile options (so we don't feed C++ flags to the assembler)
 target_compile_options(kernel_obj PRIVATE
     $<$<COMPILE_LANGUAGE:CXX>:
+        -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/src/=/editOS/
         -m32
         -ffreestanding
         # -fno-threadsafe-statics

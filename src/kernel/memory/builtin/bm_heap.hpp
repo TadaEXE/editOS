@@ -5,7 +5,7 @@
 
 #include "kernel/memory/heap.hpp"
 
-namespace memory::builtin {
+namespace mem::builtin {
 
 struct HeapBlock {
   HeapBlock* next;
@@ -16,7 +16,7 @@ struct HeapBlock {
 
 class BmHeap : public Heap {
  public:
-  explicit BmHeap(size_t default_div_size = 16) : default_div_size(default_div_size) {}
+  BmHeap() = default;
 
   BmHeap(uintptr_t addr, size_t size, size_t default_div_size = 16)
       : default_div_size(default_div_size) {
@@ -50,4 +50,4 @@ class BmHeap : public Heap {
   uint8_t last_id{0x0};
   size_t default_div_size{16};
 };
-}  // namespace memory::builtin
+}  // namespace mem::builtin

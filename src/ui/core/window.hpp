@@ -17,7 +17,7 @@ class Window : public Widget {
   void draw(gfx::Canvas& canvas) noexcept override;
   void set_position(uint32_t x, uint32_t y) noexcept override;
 
- private:
+ protected:
   gfx::Rect rect;
 
   gfx::Color bg_color{gfx::Color::Gray()};

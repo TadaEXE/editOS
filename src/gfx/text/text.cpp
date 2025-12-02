@@ -51,13 +51,6 @@ void TextRenderer::draw_text(const char* text) {
 
   while (*text) {
     char c = *text++;
-
-    if (c == '\n') {
-      last_x = lx;
-      last_y += (font.glyph_height + style.gap) * style.scale;
-      continue;
-    }
-
     draw_glyph(c);
   }
 }

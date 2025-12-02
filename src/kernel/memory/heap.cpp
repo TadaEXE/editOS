@@ -1,6 +1,6 @@
 #include "kernel/memory/heap.hpp"
 
-namespace memory {
+namespace mem {
 
 namespace {
 Heap* global_kernel_heap = nullptr;
@@ -22,4 +22,4 @@ void free(void* ptr) noexcept {
   if (global_kernel_heap) global_kernel_heap->free(ptr);
 }
 
-}  // namespace memory
+}  // namespace mem

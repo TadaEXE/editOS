@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace memory {
+namespace mem {
 
 inline constexpr uintptr_t KiB = 1024ULL;
 inline constexpr uintptr_t MiB = 1024ULL * KiB;
@@ -64,4 +64,4 @@ inline constexpr uintptr_t GiB_to_MiB(uintptr_t gib) {
   return gib * KiB;
 }
 
-}  // namespace memory
+}  // namespace mem

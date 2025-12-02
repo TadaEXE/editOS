@@ -6,9 +6,9 @@
 
 #include "kernel/memory/byte_conversion.hpp"
 
-namespace memory {
+namespace mem {
 
-static constexpr uintptr_t align_up(uintptr_t v, size_t align) noexcept {
+static constexpr uintptr_t align_to(uintptr_t v, size_t align) noexcept {
   return (v + align - 1) & ~(static_cast<uintptr_t>(align) - 1);
 }
 
@@ -47,10 +47,10 @@ H* init_heap(H* heap, uintptr_t addr, size_t size = 32 * MiB) noexcept {
 void* alloc(size_t size, size_t align = alignof(max_align_t)) noexcept;
 
 template <typename T>
-T alloc(size_t size, size_t align = alignof(max_align_t)) noexcept {
-  return reinterpret_cast<T>(alloc(size, align));
+T* alloc(size_t size, size_t align = alignof(max_align_t)) noexcept {
+  return reinterpret_cast<T*>(alloc(size, align));
 }
 
 void free(void* ptr) noexcept;
 
-}  // namespace memory
+}  // namespace mem

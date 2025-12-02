@@ -5,6 +5,18 @@
 
 namespace gfx {
 
+struct Point : public logging::Loggable {
+  uint32_t x;
+  uint32_t y;
+
+  Point() = default;
+  Point(uint32_t x, uint32_t y) : x(x), y(y) {}
+
+  static constexpr const char* fmt() noexcept { return "{x=%u, y=%u}"; }
+
+  void log_self() const noexcept override { log_obj<Point>(x, y); }
+};
+
 struct Line : public logging::Loggable {
   uint32_t s;
   uint32_t e;
@@ -36,8 +48,12 @@ struct Rect : public logging::Loggable {
   static constexpr const char* fmt() noexcept { return "{x=%u, y=%u, w=%u, h=%u}"; }
 
   /// Inclusive start, exclusive end: [x, x+w), [y, y+h)
-  constexpr bool is_inbounds(uint32_t px, uint32_t py) const {
+  constexpr bool is_inbounds(uint32_t px, uint32_t py) const noexcept {
     return (px >= x && px < x + w) && (py >= y && py < y + h);
+  }
+
+  constexpr bool is_inbounds(const Point& p) const noexcept {
+    return is_inbounds(p.x, p.y);
   }
 };
 
