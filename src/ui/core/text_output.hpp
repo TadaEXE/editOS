@@ -1,7 +1,7 @@
 #pragma once
 
 #include "gfx/text/text.hpp"
-#include "kernel/memory/data_storage.hpp"
+#include "kernel/containers/data_storage.hpp"
 #include "ui/core/window.hpp"
 
 namespace ui {
@@ -23,6 +23,6 @@ class TextOutput : public Window {
   gfx::text::TextRenderer tr;
   gfx::text::Style style;
   gfx::Point cursor{0, 0};
-  mem::HeapStorage<char> tb{256};
+  ctr::HeapStorage<char> tb{256};
 };
 }  // namespace ui
