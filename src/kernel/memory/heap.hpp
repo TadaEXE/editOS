@@ -47,8 +47,8 @@ H* init_heap(H* heap, uintptr_t addr, size_t size = 32 * MiB) noexcept {
 void* alloc(size_t size, size_t align = alignof(max_align_t)) noexcept;
 
 template <typename T>
-T* alloc(size_t size, size_t align = alignof(max_align_t)) noexcept {
-  return reinterpret_cast<T*>(alloc(size, align));
+T* alloc(size_t count, size_t align = alignof(T)) noexcept {
+  return reinterpret_cast<T*>(alloc(sizeof(T) * count, align));
 }
 
 void free(void* ptr) noexcept;
