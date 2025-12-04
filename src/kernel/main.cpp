@@ -11,8 +11,11 @@
 #include "kernel/memory/byte_conversion.hpp"
 #include "kernel/memory/heap.hpp"
 #include "kernel/panic.hpp"
+#include "logging/backend/buffered.hpp"
+#include "logging/backend/callback.hpp"
 #include "logging/backend/serial.hpp"
-#include "ui/core/text_output.hpp"
+#include "logging/logging.hpp"
+#include "ui/core/text_area.hpp"
 #include "ui/core/window.hpp"
 
 namespace {
@@ -25,22 +28,44 @@ bool kernel_fuse() {
   return true;
 }
 
-void setup_logging(boot::BootContext& ctx) {
+logging::backend::LoggingSink* setup_logging(boot::BootContext& ctx) {
   if (ctx.system_serial_bus) {
     static logging::backend::SerialSink serial_sink(*ctx.system_serial_bus);
-    logging::backend::set_sink(&serial_sink);
     log_msg("");
     log_msg("");
     log_msg("");
+    return &serial_sink;
   }
+  return nullptr;
+}
+
+logging::backend::LoggingSink* make_gui_logging(gfx::Canvas& can) {
+  gfx::Rect logging_area{can.width() - 400, 0, 400, can.height()};
+  logging_area -= 10;
+
+  ui::Window win{logging_area};
+  win.draw(can);
+
+  gfx::text::Style style{gfx::Color::Black(), gfx::Color::White(), false, 1, -2};
+  static ui::TextArea logging_output{logging_area, can, style};
+  static logging::backend::CallbackSink cb_sink(
+      [](char c, void* ctx) {
+        auto* ta = reinterpret_cast<ui::TextArea*>(ctx);
+        ta->put_char(c);
+        ta->draw();
+      },
+      &logging_output);
+
+  return &cb_sink;
 }
 }  // namespace
 
 [[noreturn]] void hal::enter_kernel(boot::BootContext& ctx) {
   if (!kernel_fuse()) panic("Entry fuse blew");
+  static logging::backend::BufferedSink<2> buffered_sink;
+  logging::backend::set_sink(&buffered_sink);
+  buffered_sink.add_sub(setup_logging(ctx));
 
-  setup_logging(ctx);
-  log_msg("fb alignment %d", alignof(hal::Framebuffer));
   log_msg("editOS kernel entered...");
   log_msg("Booted by %s", ctx.bootloader_name);
   log_msg("Bootoptions: %s", ctx.cmdline);
@@ -67,32 +92,30 @@ void setup_logging(boot::BootContext& ctx) {
 
   gfx::Canvas can(*fb);
   can.clear(0xFF202040);
-  gfx::Rect r{10, 10, 100, 100};
-
-  ui::Window win{r};
-  win.draw(can);
-
-  gfx::text::Style style{gfx::Color::Black(), gfx::Color::White(), false, 1, 0};
-  ui::TextOutput to{r, can, style};
-  // gfx::text::TextRenderer tr{can, style};
-  // tr.set_pos(200, 200);
-
-  char* buf;
-  buf = new char[5]();
-  if (!buf) panic("Fail");
-  memset(buf, 'a', 5);
+  buffered_sink.add_sub(make_gui_logging(can));
 
   auto& kb = hal::keyboard();
-  to.update();
+  gfx::Rect terminal_area{0, 0, can.width() - 400, can.height()};
+  terminal_area -= 10;
+
+  ui::Window terminal_win{terminal_area};
+  terminal_win.draw(can);
+
+  gfx::text::Style style{gfx::Color::Black(), gfx::Color::White(), false, 1, -2};
+  ui::TextArea terminal{terminal_area, can, style};
+  terminal.put_text("#>");
+  terminal.draw();
+
   for (;;) {
     hal::KeyEvent ev{};
+    char c;
     if (kb.poll(ev)) {
-      char c;
-      if (input::key_event_to_char(ev, c)) {
-        to.put_char(c);
-        to.update();
-        // to.move_cursor({0, 0});
+      if (ev.key == Key::Backspace && ev.type == hal::KeyEventType::Press) {
+        terminal.remove_last();
+      } else if (input::key_event_to_char(ev, c)) {
+        terminal.put_char(c);
       }
+      terminal.draw();
     }
   }
 }

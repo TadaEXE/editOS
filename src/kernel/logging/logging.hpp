@@ -9,7 +9,7 @@ namespace backend {
 class LoggingSink {
  public:
   virtual ~LoggingSink() = default;
-  virtual void put_char(char c) const noexcept = 0;
+  virtual void put_char(char c) noexcept = 0;
 };
 
 void set_sink(LoggingSink* sink);

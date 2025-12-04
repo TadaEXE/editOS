@@ -10,7 +10,7 @@ class SerialSink final : public LoggingSink {
  public:
   explicit SerialSink(hal::SerialBus& serial) : serial(serial) {}
 
-  void put_char(char c) const noexcept override { serial.write_char(c); }
+  void put_char(char c) noexcept override { serial.write_char(c); }
 
  private:
   hal::SerialBus& serial;

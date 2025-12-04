@@ -62,6 +62,7 @@ constexpr KeyCharEntry KEYMAP[] = {
     {Key::Period, '.', '>', 0},
     {Key::Slash, '/', '?', 0},
     {Key::Space, ' ', ' ', 0},
+    {Key::Enter, '\n', '\n', 0},
 
     {Key::Keypad0, '0', '0', 0},
     {Key::Keypad1, '1', '1', 0},

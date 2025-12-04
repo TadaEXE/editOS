@@ -38,6 +38,10 @@ class DataView {
     return true;
   }
 
+  virtual size_t count() const noexcept { return length; }
+
+  virtual size_t position() const noexcept { return pos; }
+
  protected:
   virtual bool grow_to(size_t) noexcept { return false; }
 

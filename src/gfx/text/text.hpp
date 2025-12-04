@@ -12,15 +12,16 @@ struct Style {
   Color bg;
   bool draw_bg;
   uint32_t scale{1};
-  uint32_t gap{0};
+  int32_t gap{0};
 };
 
 class TextRenderer {
  public:
   TextRenderer(Canvas& canvas, Style style, BitmapFont& font)
-      : canvas(canvas), style(style), font(font) {}
+      : font(font), canvas(canvas), style(style) {}
+
   TextRenderer(Canvas& canvas, Style style)
-      : canvas(canvas), style(style), font(builtin_font()) {}
+      : font(builtin_font()), canvas(canvas), style(style) {}
 
   void draw_glyph(char c);
   void draw_glyph(char c, uint32_t x, uint32_t y);
@@ -32,10 +33,11 @@ class TextRenderer {
 
   void set_style(Style style) { this->style = style; }
 
+  const BitmapFont& font;
+
  private:
   Canvas& canvas;
   Style style;
-  const BitmapFont& font;
   uint32_t last_x{0};
   uint32_t last_y{0};
 };

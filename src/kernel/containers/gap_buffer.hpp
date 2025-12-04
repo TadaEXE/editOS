@@ -125,8 +125,6 @@ class GapBuffer {
     size_t prefix_len = gap_begin - begin;
     size_t suffix_len = length - prefix_len;
 
-    log_msg("grow(%u) %u -> %u (%u; %u)", extend, capacity, new_cap, prefix_len, suffix_len);
-
     if (new_cap <= capacity) {
       memmove(begin + new_gap_end_offset, gap_end, suffix_len * sizeof(T));
       gap_end = begin + new_gap_end_offset;
@@ -147,15 +145,15 @@ class GapBuffer {
       return;
     }
 
-    panic("Malloc failed");
+    panic("Malloc failed. (extend: %u, cap: %u, new_cap: %u, length: %u)", extend, capacity, new_cap, length);
   }
 
-  size_t length;
-  size_t capacity;
+  size_t length{0};
+  size_t capacity{0};
 
-  T* begin;
-  T* gap_begin;
-  T* gap_end;
+  T* begin{nullptr};
+  T* gap_begin{nullptr};
+  T* gap_end{nullptr};
 
   size_t gap_width() { return gap_end - gap_begin; }
 };

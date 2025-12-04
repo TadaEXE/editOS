@@ -27,9 +27,11 @@ template <typename T>
 class HeapStorage : public mem::DataView<T> {
  public:
   explicit HeapStorage(size_t initial_capacity = 64)
-      : capacity(bits::oiz(bits::clp2(initial_capacity))),
-        buffer(mem::alloc<T>(capacity, alignof(T))),
-        mem::DataView<T>(buffer, capacity) {}
+      : mem::DataView<T>(buffer, bits::oiz(bits::clp2(initial_capacity))),
+        capacity(bits::oiz(bits::clp2(initial_capacity))),
+        buffer(mem::alloc<T>(capacity, alignof(T))) {
+    this->begin = buffer;
+  }
 
  protected:
   bool grow_to(size_t len) noexcept override {
@@ -39,7 +41,7 @@ class HeapStorage : public mem::DataView<T> {
     }
 
     auto nc = bits::clp2(capacity + 1);
-    T* tmp = alloc<T>(nc, alignof(T));
+    T* tmp = mem::alloc<T>(nc, alignof(T));
     if (!tmp) return false;
     memcpy(tmp, buffer, this->length);
 
@@ -49,7 +51,7 @@ class HeapStorage : public mem::DataView<T> {
   }
 
  private:
-  T* buffer;
-  size_t capacity;
+  size_t capacity{};
+  T* buffer{};
 };
 }  // namespace ctr

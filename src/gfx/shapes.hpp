@@ -10,6 +10,7 @@ struct Point : public logging::Loggable {
   uint32_t y;
 
   Point() = default;
+
   Point(uint32_t x, uint32_t y) : x(x), y(y) {}
 
   static constexpr const char* fmt() noexcept { return "{x=%u, y=%u}"; }
@@ -34,11 +35,18 @@ struct Rect : public logging::Loggable {
   Rect& operator=(const Rect&) = default;
   Rect& operator=(Rect&&) = default;
 
-  Rect(uint32_t x, uint32_t y, uint32_t w, uint32_t h) : x(x), y(y), w(w), h(h) {}
+  bool operator==(const Rect& other) const {
+    return other.x == x && other.y == y && other.w == w && other.h == h;
+  }
 
-  uint32_t end_x() { return x + w; }
+  bool operator!=(const Rect& other) const { return !operator==(other); }
 
-  uint32_t end_y() { return y + h; }
+  constexpr Rect(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
+      : x(x), y(y), w(w), h(h) {}
+
+  uint32_t end_x() const { return x + w; }
+
+  uint32_t end_y() const { return y + h; }
 
   Rect& operator-=(int32_t thickness);
   Rect& operator+=(int32_t thickness);
@@ -48,13 +56,13 @@ struct Rect : public logging::Loggable {
   static constexpr const char* fmt() noexcept { return "{x=%u, y=%u, w=%u, h=%u}"; }
 
   /// Inclusive start, exclusive end: [x, x+w), [y, y+h)
-  constexpr bool is_inbounds(uint32_t px, uint32_t py) const noexcept {
+  bool is_inbounds(uint32_t px, uint32_t py) const noexcept {
     return (px >= x && px < x + w) && (py >= y && py < y + h);
   }
 
-  constexpr bool is_inbounds(const Point& p) const noexcept {
-    return is_inbounds(p.x, p.y);
-  }
+  bool is_inbounds(const Point& p) const noexcept { return is_inbounds(p.x, p.y); }
+
+  static constexpr Rect Empty() { return Rect(0, 0, 0, 0); }
 };
 
 Rect operator+(const Rect& r, int32_t thickness);

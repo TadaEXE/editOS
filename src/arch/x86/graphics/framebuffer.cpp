@@ -4,13 +4,25 @@
 
 namespace x86::graphics {
 
-void Framebuffer::clear(gfx::Color color) noexcept {
+void Framebuffer::clear(gfx::Color color, gfx::Rect area) noexcept {
   if (!valid()) return;
 
-  for (uint32_t y = 0; y < height; ++y) {
+  uint32_t ys = area.y;
+  uint32_t ye = area.end_y();
+  uint32_t xs = area.x;
+  uint32_t xe = area.end_x();
+
+  if (area == gfx::Rect::Empty()) {
+    ys = 0;
+    ye = height;
+    xs = 0;
+    xe = width;
+  }
+
+  for (uint32_t y = ys; y < ye; ++y) {
     auto* row = addr + y * pitch;
     auto* px = reinterpret_cast<uint32_t*>(row);
-    for (uint32_t x = 0; x < width; ++x) {
+    for (uint32_t x = xs; x < xe; ++x) {
       px[x] = color;
     }
   }

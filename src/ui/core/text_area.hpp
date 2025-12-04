@@ -2,17 +2,18 @@
 
 #include "gfx/text/text.hpp"
 #include "kernel/containers/gap_buffer.hpp"
-#include "ui/core/window.hpp"
 
 namespace ui {
-class TextOutput : public Window {
+class TextArea {
  public:
-  TextOutput(gfx::Rect rect, gfx::Canvas& canvas, gfx::text::Style style)
-      : Window(rect), canvas(canvas), tr(canvas, style), style(style) {}
+  TextArea(gfx::Rect area, gfx::Canvas& canvas, gfx::text::Style style)
+      : area(area), canvas(canvas), tr(canvas, style), style(style) {}
 
   void put_char(char c);
   void put_text(const char* text);
-  void update();
+  void remove_last();
+  void remove_next();
+  void draw();
 
   void move_cursor(gfx::Point np);
 
@@ -20,10 +21,12 @@ class TextOutput : public Window {
   void scroll_down(size_t s);
 
  private:
+  gfx::Rect area;
   gfx::Canvas& canvas;
   gfx::text::TextRenderer tr;
   gfx::text::Style style;
-  gfx::Point cursor{0, 0};
+  gfx::Point text_cursor{0, 0};
   ctr::GapBuffer<char, 16> buffer;
+  size_t lines{0};
 };
 }  // namespace ui

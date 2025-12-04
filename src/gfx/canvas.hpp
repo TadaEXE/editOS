@@ -15,7 +15,7 @@ class Canvas {
 
   uint32_t height() const noexcept { return fb.get_height(); }
 
-  void clear(Color color) noexcept { fb.clear(color); }
+  void clear(Color color, Rect area = Rect::Empty()) noexcept { fb.clear(color, area); }
 
   void draw_pixel(uint32_t x, uint32_t y, Color color) noexcept;
 
@@ -23,10 +23,6 @@ class Canvas {
 
   void draw_border(Rect outer, Rect inner, Color color) noexcept;
   void draw_border(Rect rect, int16_t thickness, Color color) noexcept;
-
-  // void draw_char(uint32_t x, uint32_t y, char c, const text::Style& style) noexcept;
-  // void draw_text(uint32_t x, uint32_t y, const char* text,
-  //                const text::Style& style) noexcept;
 
  private:
   hal::Framebuffer& fb;

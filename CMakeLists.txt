@@ -46,7 +46,7 @@ set(KERNEL_SOURCES
     ${CMAKE_SOURCE_DIR}/src/gfx/text/bitmap_font.cpp
 
     ${CMAKE_SOURCE_DIR}/src/ui/core/window.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/core/text_output.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/core/text_area.cpp
 
     ${CMAKE_SOURCE_DIR}/src/hal/keyboard.cpp
 
