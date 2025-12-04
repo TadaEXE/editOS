@@ -28,7 +28,7 @@ class HeapStorage : public mem::DataView<T> {
  public:
   explicit HeapStorage(size_t initial_capacity = 64)
       : capacity(bits::oiz(bits::clp2(initial_capacity))),
-        buffer(mem::alloc<T>(sizeof(T) * capacity, alignof(T))),
+        buffer(mem::alloc<T>(capacity, alignof(T))),
         mem::DataView<T>(buffer, capacity) {}
 
  protected:
@@ -39,7 +39,7 @@ class HeapStorage : public mem::DataView<T> {
     }
 
     auto nc = bits::clp2(capacity + 1);
-    T* tmp = alloc<T>(sizeof(T) * nc, alignof(T));
+    T* tmp = alloc<T>(nc, alignof(T));
     if (!tmp) return false;
     memcpy(tmp, buffer, this->length);
 
@@ -52,4 +52,4 @@ class HeapStorage : public mem::DataView<T> {
   T* buffer;
   size_t capacity;
 };
-}  // namespace mem
+}  // namespace ctr

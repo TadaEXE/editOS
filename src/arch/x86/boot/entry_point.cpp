@@ -116,5 +116,5 @@ extern "C" void kmain(uint32_t mb2_info_addr) {
     auto& e = map.data[i];
     log_msg("%x = k:%x v:%p", i, static_cast<uint32_t>(e.key), e.value);
   }
-  panic("Unexpected kernel termination.");
+  panic("Unexpected kernel termination. %u", 1);
 }

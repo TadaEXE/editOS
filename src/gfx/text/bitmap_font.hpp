@@ -2,8 +2,6 @@
 
 #include <cstdint>
 
-#include "gfx/color.hpp"
-
 namespace gfx::text {
 
 struct BitmapFont {
@@ -15,6 +13,5 @@ struct BitmapFont {
 };
 
 const BitmapFont& builtin_font() noexcept;
-
 
 }  // namespace gfx::text

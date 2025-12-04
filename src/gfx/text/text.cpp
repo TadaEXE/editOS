@@ -47,8 +47,6 @@ void TextRenderer::draw_glyph(char c, uint32_t x, uint32_t y) {
 void TextRenderer::draw_text(const char* text) {
   if (!text || style.scale == 0) return;
 
-  auto lx = last_x;
-
   while (*text) {
     char c = *text++;
     draw_glyph(c);

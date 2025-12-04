@@ -30,13 +30,12 @@ set(KERNEL_SOURCES
     ${CMAKE_SOURCE_DIR}/src/kernel/memory/builtin/bm_heap.cpp
     ${CMAKE_SOURCE_DIR}/src/kernel/memory/global_hooks.cpp
     ${CMAKE_SOURCE_DIR}/src/kernel/memory/heap.cpp
-
     ${CMAKE_SOURCE_DIR}/src/kernel/abi/icxx/atexit.cpp
     ${CMAKE_SOURCE_DIR}/src/kernel/abi/icxx/guard.cpp
     ${CMAKE_SOURCE_DIR}/src/kernel/abi/icxx/pure_virtual.cpp
     ${CMAKE_SOURCE_DIR}/src/kernel/abi/gcc/int_arithmetic.cpp
     ${CMAKE_SOURCE_DIR}/src/kernel/boot/multiboot2.cpp
-    ${CMAKE_SOURCE_DIR}/src/kernel/runtime/memory.cpp
+    ${CMAKE_SOURCE_DIR}/src/kernel/runtime/cstring.cpp
     ${CMAKE_SOURCE_DIR}/src/kernel/logging/logging.cpp
 
     # ${CMAKE_SOURCE_DIR}/src/apps/editor/editor.cpp
@@ -47,10 +46,13 @@ set(KERNEL_SOURCES
     ${CMAKE_SOURCE_DIR}/src/gfx/text/bitmap_font.cpp
 
     ${CMAKE_SOURCE_DIR}/src/ui/core/window.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/core/text_output.cpp
 
     ${CMAKE_SOURCE_DIR}/src/hal/keyboard.cpp
 
     ${CMAKE_SOURCE_DIR}/src/input/keymap_us.cpp
+
+    ${CMAKE_SOURCE_DIR}/src/math/bit_logic.cpp
 
 )
 # Object library that builds all kernel sources

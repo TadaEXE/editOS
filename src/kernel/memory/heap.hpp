@@ -22,6 +22,7 @@ class Heap {
   virtual void init(uintptr_t addr, size_t size = 32 * MiB) noexcept = 0;
   virtual void* alloc(size_t size, size_t align = alignof(max_align_t)) noexcept = 0;
   virtual void free(void* ptr) noexcept = 0;
+  // virtual void report() noexcept = 0;
 };
 
 template <typename T>
@@ -52,5 +53,7 @@ T* alloc(size_t count, size_t align = alignof(T)) noexcept {
 }
 
 void free(void* ptr) noexcept;
+
+void report() noexcept;
 
 }  // namespace mem

@@ -5,106 +5,158 @@
 #include <cstring>
 
 #include "kernel/memory/heap.hpp"
+#include "kernel/panic.hpp"
 #include "math/bit_logic.hpp"
 
 namespace ctr {
 
-template <typename T, size_t GapSize = 32>
+namespace {
+template <typename T>
+constexpr size_t min_gap_size() {
+  return bits::flp2(bits::oiz(32 / sizeof(T)));
+}
+}  // namespace
+
+template <typename T, size_t GapSize = min_gap_size<T>()>
 class GapBuffer {
  public:
-  void insert(const T& item) {
-    if (gap_width() > 0) {
-      *gb++ = item;
-      ++length;
-    }
-
-    grow();
-    insert(item);
+  explicit GapBuffer(size_t initial_capacity = GapSize * 2)
+      : length(0),
+        capacity(initial_capacity < GapSize ? GapSize * 2 : initial_capacity),
+        begin(mem::alloc<T>(capacity, alignof(T))),
+        gap_begin(begin),
+        gap_end(gap_begin + GapSize) {
+    if (!begin) panic("Allocation of GapBuffer failed");
   }
 
-  void move_left(uintptr_t count = 1) {
+  ~GapBuffer() { mem::free(begin); }
+
+  const T& operator[](size_t idx) const {
+    if (idx >= length) {
+      panic("Out of range access of gap buffer at %u with length %u.", idx, length);
+    }
+
+    size_t prefix_len = gap_begin - begin;
+    if (idx < prefix_len) {
+      return begin[idx];
+    } else {
+      return gap_end[idx - prefix_len];
+    }
+  }
+
+  void insert(const T* items, size_t count = 1) {
+    if (!items) return;
     if (!count) return;
 
-    if (gb > begin) {
-      shift(gb - count, count, ge - count);
-      gb -= count;
-      ge -= count;
+    if (gap_width() >= count) {
+      for (size_t i = 0; i < count; ++i) {
+        *gap_begin++ = items[i];
+      }
+      length += count;
+      return;
     }
+
+    grow(count);
+    insert(items, count);
+  }
+
+  void move_left(size_t count = 1) {
+    if (!count) return;
+
+    size_t prefix_len = gap_begin - begin;
+    if (count > prefix_len) { count = prefix_len; }
+
+    memmove(gap_end - count, gap_begin - count, count * sizeof(T));
+    gap_begin -= count;
+    gap_end -= count;
   }
 
   void delete_left(uintptr_t count = 1) {
     if (!count) return;
 
-    auto t = gb;
-    gb = gb - count > begin ? gb - count : begin;
-    length -= t - gb;
+    auto prev_gap_begin = gap_begin;
+    gap_begin = gap_begin - count > begin ? gap_begin - count : begin;
+    length -= static_cast<size_t>(prev_gap_begin - gap_begin);
   }
 
   void move_right(uintptr_t count = 1) {
     if (!count) return;
 
-    if (ge < begin + length) {
-      shift(ge + count, count, gb);
-      gb += count;
-      gb += count;
+    auto suffix_len = length - (gap_end - begin);
+    if (count > suffix_len) { count = suffix_len; }
+
+    if ((gap_end + count) <= begin + length) {
+      memmove(gap_begin, gap_end, count * sizeof(T));
+      gap_begin += count;
+      gap_end += count;
     }
   }
 
   void delete_right(uintptr_t count = 1) {
     if (!count) return;
 
-    auto t = ge;
-    ge = ge + count < begin + capacity ? ge + count : begin + capacity;
-    length -= ge - t;
+    auto prev_gap_end = gap_end;
+    gap_end = gap_end + count < begin + length ? gap_end + count : begin + length;
+    length -= static_cast<size_t>(gap_end - prev_gap_end);
   }
 
   void move_to(uintptr_t index) {
-    if (!index) return;
-
-    auto w = gap_width();
-    if (ge + w + index) {
-      gb = begin + index;
-      ge = gb + w;
+    auto cp = cursor_pos();
+    if (index < cp) {
+      move_left(cp - index);
+    } else if (index > cp) {
+      move_right(index - cp);
     }
   }
 
-  uintptr_t cursor_pos() { return gb - begin; }
+  size_t cursor_pos() { return gap_begin - begin; }
+
+  size_t count() { return length; }
 
  private:
-  // Assumes memory is already allocated
-  void shift(T* src, size_t length, T* dest) {
-    for (size_t i = 0; i < length; ++i) {
-      dest[i] = src[i];
-    }
-  }
-
-  // Assumes memory is already allocated
-  void shift(T* src, T* stop, T* dest) {
-    for (size_t i = 0; src + i < stop; ++i) {
-      dest[i] = src[i];
-    }
-  }
-
   void grow(size_t extend) {
+    if (!extend) return;
+
     auto new_cap = bits::clp2(length + extend + GapSize);
-    auto w = gap_width();
-    T* tmp = mem::alloc<T>(sizeof(T) * new_cap, alignof(T));
-    if (!tmp) return;
 
-    uintptr_t ngb = gb - begin;
-    uintptr_t nge = ngb + GapSize;
+    size_t new_gap_begin_offset = gap_begin - begin;
+    size_t new_gap_end_offset =
+        new_gap_begin_offset + (extend < GapSize ? GapSize : extend);
+    size_t prefix_len = gap_begin - begin;
+    size_t suffix_len = length - prefix_len;
 
-    shift(begin, gb, tmp);
-    shift(ge, begin + length, tmp + nge);
+    log_msg("grow(%u) %u -> %u (%u; %u)", extend, capacity, new_cap, prefix_len, suffix_len);
+
+    if (new_cap <= capacity) {
+      memmove(begin + new_gap_end_offset, gap_end, suffix_len * sizeof(T));
+      gap_end = begin + new_gap_end_offset;
+      return;
+    }
+
+    if (T* tmp = mem::alloc<T>(new_cap, alignof(T))) {
+
+      memmove(tmp, begin, prefix_len * sizeof(T));
+      memmove(tmp + new_gap_end_offset, gap_end, suffix_len * sizeof(T));
+
+      mem::free(begin);
+
+      capacity = new_cap;
+      begin = tmp;
+      gap_begin = begin + new_gap_begin_offset;
+      gap_end = begin + new_gap_end_offset;
+      return;
+    }
+
+    panic("Malloc failed");
   }
 
-  T* begin;
   size_t length;
   size_t capacity;
 
-  T* gb;
-  T* ge;
+  T* begin;
+  T* gap_begin;
+  T* gap_end;
 
-  uintptr_t gap_width() { return ge - gb; }
+  size_t gap_width() { return gap_end - gap_begin; }
 };
 }  // namespace ctr

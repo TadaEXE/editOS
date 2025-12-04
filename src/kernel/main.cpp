@@ -12,6 +12,7 @@
 #include "kernel/memory/heap.hpp"
 #include "kernel/panic.hpp"
 #include "logging/backend/serial.hpp"
+#include "ui/core/text_output.hpp"
 #include "ui/core/window.hpp"
 
 namespace {
@@ -67,14 +68,14 @@ void setup_logging(boot::BootContext& ctx) {
   gfx::Canvas can(*fb);
   can.clear(0xFF202040);
   gfx::Rect r{10, 10, 100, 100};
-  auto r2 = r - 5;
 
   ui::Window win{r};
   win.draw(can);
 
   gfx::text::Style style{gfx::Color::Black(), gfx::Color::White(), false, 1, 0};
-  gfx::text::TextRenderer tr{can, style};
-  tr.set_pos(200, 200);
+  ui::TextOutput to{r, can, style};
+  // gfx::text::TextRenderer tr{can, style};
+  // tr.set_pos(200, 200);
 
   char* buf;
   buf = new char[5]();
@@ -82,12 +83,16 @@ void setup_logging(boot::BootContext& ctx) {
   memset(buf, 'a', 5);
 
   auto& kb = hal::keyboard();
+  to.update();
   for (;;) {
     hal::KeyEvent ev{};
     if (kb.poll(ev)) {
       char c;
-      if (input::key_event_to_char(ev, c)) { tr.draw_glyph(c); }
-      log_msg("Buffer: %s", buf);
+      if (input::key_event_to_char(ev, c)) {
+        to.put_char(c);
+        to.update();
+        // to.move_cursor({0, 0});
+      }
     }
   }
 }
