@@ -106,6 +106,18 @@ void Tty::readline(ctr::String& out, std::string_view prompt) noexcept {
       continue;
     }
 
+    if (ev.key == hal::Key::PageUp) {
+      display.scroll_up(1);
+      display.flush();
+      continue;
+    }
+
+    if (ev.key == hal::Key::PageDown) {
+      display.scroll_down(1);
+      display.flush();
+      continue;
+    }
+
     if (!input::key_event_to_char(ev, c)) continue;
 
     if (c == '\n' || c == '\r') {

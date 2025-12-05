@@ -16,16 +16,23 @@ class TextArea {
 
   void put_char(char c);
   void put_text(const char* text);
+
   void remove_last();
   void remove_next();
+
   void redraw();
 
   void move_cursor(gfx::Point np);
 
-  void scroll_up(size_t s);
-  void scroll_down(size_t s);
+  void scroll_up(size_t amount = 1);
+  void scroll_down(size_t amount = 1);
 
  private:
+  size_t visible_line_capacity() const noexcept;
+  size_t count_lines() noexcept;
+  size_t line_start_index(size_t line) const noexcept;
+  size_t line_height() const noexcept;
+
   gfx::Rect area;
   gfx::Canvas& canvas;
   gfx::text::TextRenderer tr;
@@ -33,5 +40,7 @@ class TextArea {
   gfx::Point text_cursor{0, 0};
   ctr::GapBuffer<char, 16> buffer{};
   size_t lines{0};
+  size_t first_visible_line{0};
+  bool follow_bottom{true};
 };
 }  // namespace ui

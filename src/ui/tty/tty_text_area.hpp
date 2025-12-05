@@ -20,6 +20,10 @@ class TtyTextArea : public tty::Display {
 
   void flush() noexcept override { area.redraw(); }
 
+  void scroll_up(size_t s) noexcept override { area.scroll_up(s); }
+
+  void scroll_down(size_t s) noexcept override { area.scroll_down(s); }
+
  private:
   TextArea& area;
 };
