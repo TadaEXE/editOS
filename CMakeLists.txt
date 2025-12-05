@@ -78,6 +78,7 @@ target_compile_options(kernel_obj PRIVATE
         -fno-pic
         -fno-pie
         -O2
+        # -g0
         -Wall
         -Wextra
         -std=c++20
@@ -117,6 +118,14 @@ add_custom_command(
     DEPENDS kernel ${CMAKE_SOURCE_DIR}/grub.cfg
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     VERBATIM
+)
+
+add_custom_target(analyze
+    COMMAND elf-size-analyze -H -R -o -m 10 $<TARGET_FILE:kernel>
+    COMMAND elf-size-analyze -H -R -W $<TARGET_FILE:kernel> > ram_report.html
+    COMMAND elf-size-analyze -H -F -W $<TARGET_FILE:kernel> > rom_report.html
+    DEPENDS kernel
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
 # Default target: build the ISO

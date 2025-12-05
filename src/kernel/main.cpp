@@ -49,7 +49,8 @@ logging::backend::LoggingSink* setup_logging(boot::BootContext& ctx) {
   log_msg("Booted by %s", ctx.bootloader_name);
   log_msg("Bootoptions: %s", ctx.cmdline);
   log_msg("%d KiB available in upper memory", ctx.upper_mem_kb);
-  log_msg("Kernel size %d KiB (~%d%%)", ctx.ram_start_addr - ctx.upper_mem_start,
+  log_msg("Kernel size %d MiB (~%d%%)",
+          mem::KiB_to_MiB(ctx.ram_start_addr - ctx.upper_mem_start),
           ((ctx.ram_start_addr - ctx.upper_mem_start) * 100) / ctx.upper_mem_kb);
 
   if (ctx.memory_map && ctx.memory_regions) {

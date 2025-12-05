@@ -27,6 +27,12 @@
       "displayName": "Build and run in QEMU",
       "configurePreset": "default",
       "targets": [ "run" ]
+    },
+    {
+      "name": "build-and-analyze",
+      "displayName": "Build and run elf-size-analyze",
+      "configurePreset": "default",
+      "targets": [ "analyze" ]
     }
   ]
 }
