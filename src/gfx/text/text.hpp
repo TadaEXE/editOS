@@ -29,11 +29,11 @@ class TextRenderer {
   TextRenderer(Canvas& canvas, Style style)
       : font(builtin_font()), canvas(canvas), style(style) {}
 
-  void draw_glyph(char c);
-  void draw_glyph(char c, uint32_t x, uint32_t y);
+  void draw_glyph(char c, bool inverted = false);
+  void draw_glyph(char c, uint32_t x, uint32_t y, bool inverted = false);
 
-  void draw_text(const char* text);
-  void draw_text(const char* text, uint32_t x, uint32_t y);
+  void draw_text(const char* text, bool inverted = false);
+  void draw_text(const char* text, uint32_t x, uint32_t y, bool inverted = false);
 
   void set_pos(uint32_t x, uint32_t y);
 

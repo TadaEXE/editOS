@@ -27,6 +27,10 @@ class TextArea {
   void scroll_up(size_t amount = 1);
   void scroll_down(size_t amount = 1);
 
+  gfx::Point cursor_pos() const { return real_cursor; }
+
+  size_t current_line_length() const noexcept;
+
  private:
   size_t visible_line_capacity() const noexcept;
   size_t count_lines() noexcept;
@@ -37,10 +41,16 @@ class TextArea {
   gfx::Canvas& canvas;
   gfx::text::TextRenderer tr;
   gfx::text::Style style;
-  gfx::Point text_cursor{0, 0};
+
+  gfx::Point real_cursor{0, 0};
+  gfx::Point target_cursor{0, 0};
+
   ctr::GapBuffer<char, 16> buffer{};
+  size_t real_cursor_idx{0};
+
   size_t lines{0};
   size_t first_visible_line{0};
+
   bool follow_bottom{true};
 };
 }  // namespace ui

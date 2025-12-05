@@ -15,8 +15,17 @@ struct Point : public logging::Loggable {
 
   static constexpr const char* fmt() noexcept { return "{x=%u, y=%u}"; }
 
+  bool operator==(const Point& other) const noexcept {
+    return x == other.x && y == other.y;
+  }
+
+  bool operator!=(const Point& other) const noexcept { return !operator==(other); }
+
   void log_self() const noexcept override { log_obj<Point>(x, y); }
 };
+
+Point operator-(Point a, Point b);
+Point operator+(Point a, Point b);
 
 struct Line : public logging::Loggable {
   uint32_t s;
@@ -65,8 +74,8 @@ struct Rect : public logging::Loggable {
   static constexpr Rect Empty() { return Rect(0, 0, 0, 0); }
 };
 
-Rect operator+(const Rect& r, int32_t thickness);
-Rect operator-(const Rect& r, int32_t thickness);
+Rect operator+(Rect r, int32_t thickness);
+Rect operator-(Rect r, int32_t thickness);
 
 struct Sphere {
   uint32_t x;

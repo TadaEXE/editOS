@@ -1,4 +1,3 @@
-#include <array>
 #include <cstring>
 #include <string_view>
 
@@ -8,7 +7,6 @@
 #include "gfx/text/text.hpp"
 #include "hal/boot.hpp"
 #include "hal/keyboard.hpp"
-#include "input/keymap.hpp"
 #include "kernel/log.hpp"
 #include "kernel/memory/byte_conversion.hpp"
 #include "kernel/panic.hpp"
@@ -96,7 +94,7 @@ logging::backend::LoggingSink* setup_logging(boot::BootContext& ctx) {
   ui::Window tty_win{tty_rect};
   tty_win.draw(can);
 
-  gfx::text::Style style{gfx::Color::Black(), gfx::Color::White(), false, 1, -2};
+  gfx::text::Style style{gfx::Color::Black(), gfx::Color::White(), false, 1, -2, 1};
   ui::TextArea area{tty_rect, can, style};
   ui::TtyTextArea tty_area(area);
   tty::Tty tty{tty_area, kb};
@@ -104,7 +102,6 @@ logging::backend::LoggingSink* setup_logging(boot::BootContext& ctx) {
   ctr::String sl;
   for (;;) {
     tty.readline(sl, "#>");
-    // tty.write_line(std::string_view{line, l});
     tty.write_line(sl);
   }
 }

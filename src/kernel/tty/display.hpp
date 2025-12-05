@@ -2,6 +2,8 @@
 
 #include <cstddef>
 
+#include "gfx/shapes.hpp"
+
 namespace tty {
 
 class Display {
@@ -10,7 +12,18 @@ class Display {
   virtual void put_char(char c) noexcept = 0;
   virtual void backspace() noexcept = 0;
   virtual void flush() noexcept = 0;
-  virtual void scroll_up(size_t s) noexcept = 0;
-  virtual void scroll_down(size_t s) noexcept = 0;
+
+  virtual void scroll_up(size_t amount) noexcept = 0;
+  virtual void scroll_down(size_t amount) noexcept = 0;
+
+  virtual void move_left(size_t amount) noexcept = 0;
+  virtual void move_right(size_t amount) noexcept = 0;
+
+  virtual void move_up(size_t amount) noexcept = 0;
+  virtual void move_down(size_t amount) noexcept = 0;
+
+  virtual void move_end() noexcept = 0;
+
+  virtual gfx::Point cursor() noexcept = 0;
 };
 }  // namespace tty

@@ -4,7 +4,7 @@
 
 namespace gfx::text {
 
-void TextRenderer::draw_glyph(char c) {
+void TextRenderer::draw_glyph(char c, bool inverted) {
   if (style.scale == 0) return;
   if (c < font.first_char || c > font.last_char) return;
 
@@ -15,11 +15,11 @@ void TextRenderer::draw_glyph(char c) {
     uint8_t row = glyph[gy];
 
     for (uint32_t gx = 0; gx < font.glyph_width; ++gx) {
-      bool on = (row & (1u << (font.glyph_width - 1u - gx))) != 0u;
+      bool on = ((row & (1u << (font.glyph_width - 1u - gx))) != 0u) ^ inverted;
 
       if (!on && !style.draw_bg) { continue; }
 
-      Color c = on ? style.fg : style.bg;
+      Color c = on || inverted ? style.fg : style.bg;
 
       uint32_t px = last_x + gx * style.scale;
       uint32_t py = last_y + gy * style.scale;
@@ -35,30 +35,30 @@ void TextRenderer::draw_glyph(char c) {
   last_x += (font.glyph_width + style.gap_x) * style.scale;
 }
 
-void TextRenderer::draw_glyph(char c, uint32_t x, uint32_t y) {
+void TextRenderer::draw_glyph(char c, uint32_t x, uint32_t y, bool inverted) {
   if (style.scale == 0) return;
   if (c < font.first_char || c > font.last_char) return;
 
   last_x = x;
   last_y = y;
-  draw_glyph(c);
+  draw_glyph(c, inverted);
 }
 
-void TextRenderer::draw_text(const char* text) {
+void TextRenderer::draw_text(const char* text, bool inverted) {
   if (!text || style.scale == 0) return;
 
   while (*text) {
     char c = *text++;
-    draw_glyph(c);
+    draw_glyph(c, inverted);
   }
 }
 
-void TextRenderer::draw_text(const char* text, uint32_t x, uint32_t y) {
+void TextRenderer::draw_text(const char* text, uint32_t x, uint32_t y, bool inverted) {
   if (!text || style.scale == 0) return;
 
   last_x = x;
   last_y = y;
-  draw_text(text);
+  draw_text(text, inverted);
 }
 
 void TextRenderer::set_pos(uint32_t x, uint32_t y) {

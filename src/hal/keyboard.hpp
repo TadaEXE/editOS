@@ -151,6 +151,10 @@ inline KeyMod operator&(KeyMod a, KeyMod b) noexcept {
   return static_cast<KeyMod>(static_cast<uint16_t>(a) & static_cast<uint16_t>(b));
 }
 
+inline KeyMod operator^(KeyMod a, KeyMod b) noexcept {
+  return static_cast<KeyMod>(static_cast<uint16_t>(a) ^ static_cast<uint16_t>(b));
+}
+
 inline KeyMod& operator|=(KeyMod& a, KeyMod b) noexcept {
   a = a | b;
   return a;
@@ -180,6 +184,7 @@ struct KeyEvent : logging::Loggable {
   bool extended;
 
   constexpr KeyEvent() = default;
+
   constexpr KeyEvent(Key key, KeyEventType type, KeyMod mods, uint8_t scan_code,
                      bool extended)
       : key(key), type(type), mods(mods), scan_code(scan_code), extended(extended) {}
@@ -187,6 +192,10 @@ struct KeyEvent : logging::Loggable {
   static constexpr const char* fmt() noexcept {
     return "{key: %x, type: %u, mods: %x, scan_code: %x, extended: %u}";
   }
+
+  inline bool has_mod(KeyMod mod) const { return (mods & mod) == mod; }
+
+  inline bool has_only_mod(KeyMod mod) const { return (mods ^ mod) == KeyMod::None; }
 
   void log_self() const noexcept override {
     log_obj<KeyEvent>(key, type, mods, scan_code, extended);

@@ -118,12 +118,55 @@ void Tty::readline(ctr::String& out, std::string_view prompt) noexcept {
       continue;
     }
 
-    if (!input::key_event_to_char(ev, c)) continue;
+    if (ev.key == hal::Key::Right) {
+      display.move_right(1);
+      display.flush();
+      continue;
+    }
+
+    if (!input::key_event_to_char(ev, c)) {
+      using hal::Key;
+      switch (ev.key) {
+        case Key::Backspace:
+          if (!out.empty()) {
+            out.pop_back();
+            display.backspace();
+          }
+          break;
+        case Key::Right:
+          display.move_right(1);
+          break;
+        case Key::Left:
+          if (display.cursor().x > prompt.size()) { display.move_left(1); }
+          break;
+        case Key::Up:
+          display.move_up(1);
+          break;
+        case Key::Down:
+          display.move_down(1);
+          break;
+        case Key::PageUp:
+          display.scroll_up(1);
+          break;
+        case Key::PageDown:
+          display.scroll_down(1);
+          break;
+        case Key::End:
+          display.move_end();
+          break;
+        default:
+          break;
+      }
+      display.flush();
+      continue;
+    }
 
     if (c == '\n' || c == '\r') {
+      display.move_end();
+      display.flush();
       display.put_char('\n');
       display.flush();
-      return;  // out.size();
+      return;
     }
 
     out.push_back(c);
