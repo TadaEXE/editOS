@@ -1,19 +1,23 @@
+#include <array>
 #include <cstring>
+#include <string_view>
 
+#include "containers/string.hpp"
 #include "gfx/canvas.hpp"
 #include "gfx/shapes.hpp"
 #include "gfx/text/text.hpp"
 #include "hal/boot.hpp"
 #include "hal/keyboard.hpp"
-#include "input/keymap_us.hpp"
+#include "input/keymap.hpp"
 #include "kernel/log.hpp"
 #include "kernel/memory/byte_conversion.hpp"
 #include "kernel/panic.hpp"
-#include "logging/backend/callback.hpp"
+#include "kernel/tty/tty.hpp"
 #include "logging/backend/serial.hpp"
 #include "logging/logging.hpp"
 #include "ui/core/text_area.hpp"
 #include "ui/core/window.hpp"
+#include "ui/tty/tty_text_area.hpp"
 
 namespace {
 bool kernel_fuse() {
@@ -36,25 +40,25 @@ logging::backend::LoggingSink* setup_logging(boot::BootContext& ctx) {
   return nullptr;
 }
 
-logging::backend::LoggingSink* make_gui_logging(gfx::Canvas& can) {
-  gfx::Rect logging_area{can.width() - 400, 0, 400, can.height()};
-  logging_area -= 10;
-
-  ui::Window win{logging_area};
-  win.draw(can);
-
-  gfx::text::Style style{gfx::Color::Black(), gfx::Color::White(), false, 1, -2};
-  static ui::TextArea logging_output{logging_area, can, style};
-  static logging::backend::CallbackSink cb_sink(
-      [](char c, void* ctx) {
-        auto* ta = reinterpret_cast<ui::TextArea*>(ctx);
-        ta->put_char(c);
-        ta->redraw();
-      },
-      &logging_output);
-
-  return &cb_sink;
-}
+// logging::backend::LoggingSink* make_gui_logging(gfx::Canvas& can) {
+//   gfx::Rect logging_area{can.width() - 400, 0, 400, can.height()};
+//   logging_area -= 10;
+//
+//   ui::Window win{logging_area};
+//   win.draw(can);
+//
+//   gfx::text::Style style{gfx::Color::Black(), gfx::Color::White(), false, 1, -2};
+//   static ui::TextArea logging_output{logging_area, can, style};
+//   static logging::backend::CallbackSink cb_sink(
+//       [](char c, void* ctx) {
+//         auto* ta = reinterpret_cast<ui::TextArea*>(ctx);
+//         ta->put_char(c);
+//         ta->redraw();
+//       },
+//       &logging_output);
+//
+//   return &cb_sink;
+// }
 }  // namespace
 
 [[noreturn]] void hal::enter_kernel(boot::BootContext& ctx) {
@@ -86,27 +90,21 @@ logging::backend::LoggingSink* make_gui_logging(gfx::Canvas& can) {
   can.clear(0xFF202040);
 
   auto& kb = hal::keyboard();
-  gfx::Rect terminal_area{0, 0, can.width(), can.height()};
-  terminal_area -= 10;
+  gfx::Rect tty_rect{0, 0, can.width(), can.height()};
+  tty_rect -= 10;
 
-  ui::Window terminal_win{terminal_area};
-  terminal_win.draw(can);
+  ui::Window tty_win{tty_rect};
+  tty_win.draw(can);
 
   gfx::text::Style style{gfx::Color::Black(), gfx::Color::White(), false, 1, -2};
-  ui::TextArea terminal{terminal_area, can, style};
-  terminal.put_text("#>");
-  terminal.redraw();
+  ui::TextArea area{tty_rect, can, style};
+  ui::TtyTextArea tty_area(area);
+  tty::Tty tty{tty_area, kb};
 
+  ctr::String sl;
   for (;;) {
-    hal::KeyEvent ev{};
-    char c;
-    if (kb.poll(ev)) {
-      if (ev.key == Key::Backspace && ev.type == hal::KeyEventType::Press) {
-        terminal.remove_last();
-      } else if (input::key_event_to_char(ev, c)) {
-        terminal.put_char(c);
-      }
-      terminal.redraw();
-    }
+    tty.readline(sl, "#>");
+    // tty.write_line(std::string_view{line, l});
+    tty.write_line(sl);
   }
 }
