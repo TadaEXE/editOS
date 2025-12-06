@@ -1,7 +1,5 @@
 #include <cstring>
-#include <string_view>
 
-#include "containers/string.hpp"
 #include "gfx/canvas.hpp"
 #include "gfx/shapes.hpp"
 #include "gfx/text/text.hpp"

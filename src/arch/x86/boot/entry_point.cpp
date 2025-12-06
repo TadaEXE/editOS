@@ -108,7 +108,7 @@ extern "C" void kmain(uint32_t mb2_info_addr) {
   if (mb2::get_cmdline(&str))
     ctx.cmdline = str;
   else
-    ctx.cmdline = "";
+    ctx.cmdline = "<none>";
 
   if (mb2::get_bootloader_name(&str))
     ctx.bootloader_name = str;
