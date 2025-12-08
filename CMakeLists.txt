@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-set( CMAKE_VERBOSE_MAKEFILE on )
+# set( CMAKE_VERBOSE_MAKEFILE on )
 project(editOS LANGUAGES CXX ASM)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -10,19 +10,15 @@ set(CMAKE_SYSTEM_PROCESSOR x86_64)
 
 enable_language(ASM)
 
-set(CMAKE_ASM_COMPILER  x86_64-elf-as)
-set(CMAKE_C_COMPILER   x86_64-elf-gcc)
-set(CMAKE_CXX_COMPILER x86_64-elf-g++)
-
-set(SYSROOT
-  "${CMAKE_SOURCE_DIR}/sysroot"
-  CACHE PATH "Sysroot used for cross builds"
-)
+set(TOOLCHAIN_DIR ${CMAKE_SOURCE_DIR}/cross-compiler-setup/toolchain/bin)
+set(CMAKE_ASM_COMPILER ${TOOLCHAIN_DIR}/x86_64-elf-as)
+set(CMAKE_C_COMPILER   ${TOOLCHAIN_DIR}/x86_64-elf-gcc)
+set(CMAKE_CXX_COMPILER ${TOOLCHAIN_DIR}/x86_64-elf-g++)
 
 set(ARCH "x86" CACHE STRING "Target architecture (e.g. x86, x86_64)")
 
 set(LIB_C_SOURCES
-    ${CMAKE_SOURCE_DIR}/src/libc/src/abort.cpp
+    ${CMAKE_SOURCE_DIR}/src/libc/src/stdlib.cpp
     ${CMAKE_SOURCE_DIR}/src/libc/src/stdio.cpp
     ${CMAKE_SOURCE_DIR}/src/libc/src/string.cpp
 )
@@ -91,8 +87,8 @@ target_include_directories(kernel_obj PRIVATE
 
 target_compile_options(kernel_obj PRIVATE
     $<$<COMPILE_LANGUAGE:CXX>:
-        --sysroot=${SYSROOT}
         -fmacro-prefix-map=${CMAKE_SOURCE_DIR}/src/=/editOS/
+        # -march=i386
         -ffreestanding
         -fno-exceptions
         -fno-rtti
@@ -115,7 +111,6 @@ set_target_properties(kernel PROPERTIES
 
 target_link_libraries(kernel PRIVATE libc_obj)
 
-# Link options: 32-bit, no stdlib, custom linker script
 target_link_options(kernel PRIVATE
     --sysroot=${SYSROOT}
     -nostdlib
@@ -151,7 +146,7 @@ add_custom_target(analyze
 add_custom_target(iso ALL DEPENDS ${ISO_FILE})
 
 add_custom_target(run
-    COMMAND qemu-system-i386
+    COMMAND qemu-system-x86_64
             -cdrom ${ISO_FILE}
             -chardev vc,id=serialgui,logfile=serial.log,logappend=on
             -serial chardev:serialgui
