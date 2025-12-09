@@ -4,8 +4,8 @@
 #include <cstdint>
 #include <cstring>
 
-#include "panic.hpp"
 #include "math/bit_logic.hpp"
+#include <kernel/panic.hpp>
 
 namespace mem::builtin {
 
@@ -54,14 +54,14 @@ void* BmHeap::alloc(size_t size, size_t align) noexcept {
 
   if (align == 0) { align = alignof(max_align_t); }
 
-  if (!bits::ipo2(align)) {
+  if (!math::ipo2(align)) {
     panic("Tried to allocate missaligned memory (Not a power of 2).");
   }
 
   for (HeapBlock* block = front; block != nullptr; block = block->next) {
     if (block->remaining < size) continue;
 
-    size_t needed_divs = bits::oiz((size + block->div_size - 1) / block->div_size);
+    size_t needed_divs = math::oiz((size + block->div_size - 1) / block->div_size);
     auto* bitmap = bitmap_for(block);
     auto* data = data_begin(block);
     uintptr_t data_addr = reinterpret_cast<uintptr_t>(data);

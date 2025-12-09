@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace mem {
+namespace ctr {
 
 enum class SeekType {
   Forward,

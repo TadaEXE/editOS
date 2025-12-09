@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdarg>
 
 /// Log a C-style formatted message, that will always put a newline.
 /// Cancel the automatic new line by putting an '\\' at the end of the fmt.
@@ -12,3 +13,4 @@
 ///   %p - ptr
 ///   %o - loggable obj
 void log_msg(const char* fmt, ...);
+void log_msg(const char* fmt, va_list args);

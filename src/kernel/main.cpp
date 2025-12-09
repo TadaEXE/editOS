@@ -1,17 +1,18 @@
 #include <cstring>
 
+#include <kernel/log.hpp>
+#include <kernel/panic.hpp>
+
 #include "gfx/canvas.hpp"
 #include "gfx/shapes.hpp"
 #include "gfx/text/text.hpp"
-#include "hal/keyboard.hpp"
 #include "hal/boot.hpp"
-#include "log.hpp"
-#include "memory/byte_conversion.hpp"
-#include "panic.hpp"
-#include "shell/shell.hpp"
-#include "tty/tty.hpp"
+#include "hal/keyboard.hpp"
 #include "logging/backend/serial.hpp"
 #include "logging/logging.hpp"
+#include "memory/byte_conversion.hpp"
+#include "shell/shell.hpp"
+#include "tty/tty.hpp"
 #include "ui/core/text_area.hpp"
 #include "ui/core/window.hpp"
 #include "ui/tty/tty_text_area.hpp"

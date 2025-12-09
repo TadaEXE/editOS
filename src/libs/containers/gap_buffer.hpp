@@ -3,8 +3,8 @@
 #include <cstddef>
 #include <cstring>
 
-#include "memory/heap.hpp"
-#include "panic.hpp"
+#include <kernel/panic.hpp>
+
 #include "math/bit_logic.hpp"
 
 namespace ctr {
@@ -12,7 +12,7 @@ namespace ctr {
 namespace {
 template <typename T>
 constexpr size_t min_gap_size() {
-  return bits::flp2(bits::oiz(32 / sizeof(T)));
+  return math::flp2(math::oiz(32 / sizeof(T)));
 }
 }  // namespace
 
@@ -22,7 +22,7 @@ class GapBuffer {
   explicit GapBuffer(size_t initial_capacity = GapSize * 2)
       : length(0),
         capacity(initial_capacity < GapSize ? GapSize * 2 : initial_capacity),
-        begin(mem::alloc<T>(capacity, alignof(T))),
+        begin(new T[initial_capacity]),
         gap_begin(begin),
         gap_end(gap_begin + GapSize) {
     if (!begin) panic("Allocation of GapBuffer failed");
@@ -33,7 +33,9 @@ class GapBuffer {
   GapBuffer& operator=(const GapBuffer&) = delete;
   GapBuffer& operator=(GapBuffer&&) = delete;
 
-  ~GapBuffer() { mem::free(begin); }
+  ~GapBuffer() {
+    if (begin) delete[] begin;
+  }
 
   const T& operator[](size_t idx) const {
     if (idx >= length) {
@@ -129,7 +131,7 @@ class GapBuffer {
   void grow(size_t extend) {
     if (!extend) return;
 
-    size_t new_cap = bits::clp2(length + extend + GapSize);
+    size_t new_cap = math::clp2(length + extend + GapSize);
 
     size_t prefix_len = static_cast<size_t>(gap_begin - begin);
     size_t suffix_len = length - prefix_len;
@@ -143,11 +145,12 @@ class GapBuffer {
       return;
     }
 
-    if (T* tmp = mem::alloc<T>(new_cap, alignof(T))) {
+    T* tmp = new T[new_cap];
+    if (tmp) {
       memmove(tmp, begin, prefix_len * sizeof(T));
       memmove(tmp + new_gap_end_off, gap_end, suffix_len * sizeof(T));
 
-      mem::free(begin);
+      delete[] begin;
 
       capacity = new_cap;
       begin = tmp;

@@ -184,3 +184,7 @@ void log_msg(const char* fmt, ...) {
   logging::internal::vmsg_impl(true, fmt, args);
   va_end(args);
 }
+
+void log_msg(const char* fmt, va_list args) {
+  logging::internal::vmsg_impl(true, fmt, args);
+}

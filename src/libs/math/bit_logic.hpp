@@ -6,7 +6,7 @@
 // If someone ever finds this header (me in a week) and wants to know why all function are cryptic combinations of three letters...
 // IDK
 
-namespace bits {
+namespace math {
 
 static constexpr bool ipo2(size_t x) {
   return (x & (x - 1)) == 0;

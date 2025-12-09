@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace bits {
+namespace math {
 
 uint32_t flp2(uint32_t x) {
   x |= x >> 1;
@@ -44,4 +44,4 @@ uint64_t clp2(uint64_t x) {
   return x + 1;
 }
 
-}  // namespace bits
+}  // namespace math

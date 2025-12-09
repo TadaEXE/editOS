@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <type_traits>
 
-#include "log.hpp"
+#include <kernel/log.hpp>
 
 namespace ctr {
 

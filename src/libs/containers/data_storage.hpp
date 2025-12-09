@@ -4,8 +4,7 @@
 #include <cstring>
 #include <type_traits>
 
-#include "memory/data_view.hpp"
-#include "memory/heap.hpp"
+#include "containers/data_view.hpp"
 #include "math/bit_logic.hpp"
 
 namespace ctr {
@@ -13,9 +12,9 @@ namespace ctr {
 /// @brief Stack-based owing implementation of non-owning DataView
 template <typename T, size_t Size>
   requires std::is_trivially_copyable_v<T>
-class StackStorage : public mem::DataView<T> {
+class StackStorage : public ctr::DataView<T> {
  public:
-  StackStorage() : mem::DataView<T>(buffer, Size) {}
+  StackStorage() : ctr::DataView<T>(buffer, Size) {}
 
   StackStorage(const StackStorage&) = delete;
   StackStorage(StackStorage&&) = delete;
@@ -29,13 +28,17 @@ class StackStorage : public mem::DataView<T> {
 /// @brief Heap-based owing implementation of non-owning DataView
 template <typename T>
   requires std::is_trivially_copyable_v<T>
-class HeapStorage : public mem::DataView<T> {
+class HeapStorage : public ctr::DataView<T> {
  public:
   explicit HeapStorage(size_t initial_capacity = 64)
-      : mem::DataView<T>(buffer, bits::oiz(bits::clp2(initial_capacity))),
-        capacity(bits::oiz(bits::clp2(initial_capacity))),
-        buffer(mem::alloc<T>(capacity, alignof(T))) {
+      : ctr::DataView<T>(buffer, math::oiz(math::clp2(initial_capacity))),
+        capacity(math::oiz(math::clp2(initial_capacity))),
+        buffer(new T[capacity]) {
     this->begin = buffer;
+  }
+
+  ~HeapStorage() {
+    if (buffer) delete[] buffer;
   }
 
   HeapStorage(const HeapStorage&) = delete;
@@ -50,10 +53,12 @@ class HeapStorage : public mem::DataView<T> {
       return true;
     }
 
-    auto nc = bits::clp2(capacity + 1);
-    T* tmp = mem::alloc<T>(nc, alignof(T));
+    auto nc = math::clp2(capacity + 1);
+    T* tmp = new T[nc];
     if (!tmp) return false;
+
     memcpy(tmp, buffer, this->length);
+    delete[] buffer;
 
     capacity = nc;
     buffer = tmp;

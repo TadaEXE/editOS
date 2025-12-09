@@ -4,8 +4,6 @@
 #include <cstring>
 #include <string_view>
 
-#include "memory/heap.hpp"
-
 namespace ctr {
 
 class String {
@@ -51,7 +49,9 @@ class String {
     other.cap = 0;
   }
 
-  ~String() { mem::free(buffer); }
+  ~String() {
+    if (buffer) delete[] buffer;
+  }
 
   String& operator=(const String& other) {
     if (this == &other) { return *this; }
@@ -62,10 +62,11 @@ class String {
     }
 
     if (other.length > cap) {
-      char* new_data = mem::alloc<char>(other.length + 1);
-      mem::free(buffer);
+      auto new_cap = other.length + 1;
+      char* new_data = new char[new_cap];
+      delete[] buffer;
       buffer = new_data;
-      cap = other.length;
+      cap = new_cap;
     }
 
     memmove(buffer, other.buffer, other.length);
@@ -77,7 +78,7 @@ class String {
   String& operator=(String&& other) noexcept {
     if (this == &other) { return *this; }
 
-    mem::free(buffer);
+    delete[] buffer;
 
     buffer = other.buffer;
     length = other.length;
@@ -102,8 +103,8 @@ class String {
     if (sv.empty()) { return *this; }
 
     if (sv.size() > cap) {
-      char* new_data = mem::alloc<char>(sv.size() + 1);
-      mem::free(buffer);
+      char* new_data = new char[sv.size() + 1];
+      delete[] buffer;
       buffer = new_data;
       cap = sv.size();
     }
@@ -140,13 +141,13 @@ class String {
 
     if (new_cap < length) { new_cap = length; }
 
-    char* new_data = mem::alloc<char>(new_cap + 1);
+    char* new_data = new char[new_cap + 1];
 
     if (buffer && length > 0) { memmove(new_data, buffer, length); }
 
     new_data[length] = '\0';
 
-    mem::free(buffer);
+    delete[] buffer;
     buffer = new_data;
     cap = new_cap;
   }
