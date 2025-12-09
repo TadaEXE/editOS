@@ -1,6 +1,6 @@
 #pragma once
 
-#include "kernel/memory/heap.hpp"
+#include "memory/heap.hpp"
 
 namespace mem {
 

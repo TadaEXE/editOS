@@ -1,10 +1,10 @@
-#include "kernel/memory/builtin/bm_heap.hpp"
+#include "memory/builtin/bm_heap.hpp"
 
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 
-#include "kernel/panic.hpp"
+#include "panic.hpp"
 #include "math/bit_logic.hpp"
 
 namespace mem::builtin {

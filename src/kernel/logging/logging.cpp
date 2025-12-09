@@ -1,4 +1,4 @@
-#include "kernel/logging/logging.hpp"
+#include "logging/logging.hpp"
 
 #include <cstdarg>
 #include <cstdint>

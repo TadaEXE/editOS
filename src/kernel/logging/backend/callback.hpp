@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdarg>
 
-#include "kernel/logging/logging.hpp"
+#include "logging/logging.hpp"
 
 namespace logging::backend {
 

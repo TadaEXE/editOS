@@ -7,9 +7,9 @@
 
 namespace hal {
 
-class IFramebuffer {
+class Framebuffer {
  public:
-  virtual ~IFramebuffer() = default;
+  virtual ~Framebuffer() = default;
 
   virtual bool valid() const noexcept = 0;
   virtual void clear(gfx::Color color, gfx::Rect area = gfx::Rect::Empty()) noexcept = 0;

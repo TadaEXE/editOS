@@ -1,6 +1,6 @@
 #pragma once
 
-#include "kernel/tty/display.hpp"
+#include "tty/display.hpp"
 #include "ui/core/text_area.hpp"
 
 namespace ui {

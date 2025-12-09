@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "kernel/memory/byte_conversion.hpp"
+#include "memory/byte_conversion.hpp"
 
 namespace mem {
 

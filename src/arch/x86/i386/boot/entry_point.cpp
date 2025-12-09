@@ -1,14 +1,14 @@
 #include <cstdint>
 #include <iterator>
 
-#include "arch/x86/common/graphics/framebuffer.hpp"
+#include "x86/common/graphics/framebuffer.hpp"
 #include "hal/boot.hpp"
 #include "hal/serial.hpp"
-#include "kernel/boot/boot_context.hpp"
-#include "kernel/log.hpp"
-#include "kernel/memory/builtin/bm_heap.hpp"
-#include "kernel/memory/heap.hpp"
-#include "kernel/panic.hpp"
+#include "boot/boot_context.hpp"
+#include "log.hpp"
+#include "memory/builtin/bm_heap.hpp"
+#include "memory/heap.hpp"
+#include "panic.hpp"
 
 using namespace x86;
 

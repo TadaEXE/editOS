@@ -4,8 +4,8 @@
 #include <cstring>
 #include <type_traits>
 
-#include "kernel/memory/data_view.hpp"
-#include "kernel/memory/heap.hpp"
+#include "memory/data_view.hpp"
+#include "memory/heap.hpp"
 #include "math/bit_logic.hpp"
 
 namespace ctr {

@@ -2,7 +2,7 @@
 #include <cstdarg>
 #include <cstring>
 
-#include "kernel/logging/logging.hpp"
+#include "logging/logging.hpp"
 
 namespace logging::backend {
 

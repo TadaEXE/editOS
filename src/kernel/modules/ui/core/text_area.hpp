@@ -1,7 +1,10 @@
 #pragma once
+#include <cstddef>
 
+#include "containers/gap_buffer.hpp"
+#include "gfx/canvas.hpp"
+#include "gfx/shapes.hpp"
 #include "gfx/text/text.hpp"
-#include "kernel/containers/gap_buffer.hpp"
 
 namespace ui {
 class TextArea {

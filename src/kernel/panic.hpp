@@ -4,7 +4,7 @@
 #include <utility>
 
 #include "hal/system.hpp"
-#include "kernel/log.hpp"
+#include "log.hpp"
 
 template <typename... Args>
 struct panic {

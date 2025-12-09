@@ -3,8 +3,8 @@
 #include <cstddef>
 #include <string_view>
 
-#include "kernel/containers/string.hpp"
-#include "kernel/tty/tty.hpp"
+#include "containers/string.hpp"
+#include "tty/tty.hpp"
 
 namespace shell {
 

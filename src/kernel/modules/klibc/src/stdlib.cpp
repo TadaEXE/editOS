@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
-#include "kernel/memory/heap.hpp"
-#include "kernel/panic.hpp"
+#include "memory/heap.hpp"
+#include "panic.hpp"
 
 #ifdef __cplusplus
 extern "C" {

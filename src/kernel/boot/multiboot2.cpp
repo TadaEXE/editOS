@@ -1,4 +1,4 @@
-#include "kernel/boot/multiboot2.hpp"
+#include "boot/multiboot2.hpp"
 
 #include <cstdint>
 #include <cstring>

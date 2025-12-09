@@ -4,7 +4,7 @@
 #include <cstring>
 #include <string_view>
 
-#include "kernel/memory/heap.hpp"
+#include "memory/heap.hpp"
 
 namespace ctr {
 

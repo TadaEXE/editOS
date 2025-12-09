@@ -1,12 +1,12 @@
-#include "kernel/shell/shell.hpp"
+#include "shell/shell.hpp"
 
 #include <cstddef>
 #include <cstring>
 #include <string_view>
 
 #include "hal/system.hpp"
-#include "kernel/containers/string.hpp"
-#include "kernel/tty/tty.hpp"
+#include "containers/string.hpp"
+#include "tty/tty.hpp"
 
 namespace shell {
 namespace builtin {

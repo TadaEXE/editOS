@@ -1,9 +1,9 @@
-#include "kernel/memory/builtin/bump_heap.hpp"
+#include "memory/builtin/bump_heap.hpp"
 
 #include <cstddef>
 #include <cstdint>
 
-#include "kernel/memory/heap.hpp"
+#include "memory/heap.hpp"
 
 namespace mem {
 

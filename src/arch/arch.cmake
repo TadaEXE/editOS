@@ -1,3 +1,7 @@
+list(APPEND ARCH_INCLUDE_DIRS
+    ${CMAKE_CURRENT_LIST_DIR}
+)
+
 if(ARCH_FAMILY STREQUAL "x86")
     include("${CMAKE_CURRENT_LIST_DIR}/x86/x86.cmake")
 else()

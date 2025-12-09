@@ -1,6 +1,6 @@
 #include "hal/system.hpp"
 
-#include "arch/x86/common/io/ports.hpp"
+#include "x86/common/io/ports.hpp"
 
 namespace hal::sys {
 

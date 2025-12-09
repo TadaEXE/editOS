@@ -1,4 +1,4 @@
-#include "apps/editor/editor.hpp"
+#include "editor/editor.hpp"
 #include "hal/keyboard.hpp"
 
 #include <cstdint>

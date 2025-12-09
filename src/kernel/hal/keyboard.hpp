@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 
-#include "kernel/logging/logging.hpp"
+#include "logging/logging.hpp"
 
 namespace hal {
 

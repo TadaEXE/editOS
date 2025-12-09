@@ -2,13 +2,13 @@
 #include <optional>
 
 #include "hal/framebuffer.hpp"
-#include "kernel/boot/boot_context.hpp"
+#include "boot/boot_context.hpp"
 
 namespace hal {
 
 [[noreturn]] void enter_kernel(boot::BootContext& ctx);
 
-std::optional<IFramebuffer> get_boot_framebuffer();
+std::optional<Framebuffer> get_boot_framebuffer();
 
 class BootFramebuffer {
  public:
@@ -24,14 +24,14 @@ class BootFramebuffer {
 
   bool available() { return boot_fb != nullptr; }
 
-  IFramebuffer* get() { return boot_fb; }
+  Framebuffer* get() { return boot_fb; }
 
-  void set(IFramebuffer* fb) { boot_fb = fb; }
+  void set(Framebuffer* fb) { boot_fb = fb; }
 
  private:
   BootFramebuffer() {}
 
-  IFramebuffer* boot_fb;
+  Framebuffer* boot_fb;
 };
 
 }  // namespace hal

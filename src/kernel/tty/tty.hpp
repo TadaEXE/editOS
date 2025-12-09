@@ -3,8 +3,8 @@
 #include <string_view>
 
 #include "hal/keyboard.hpp"
-#include "kernel/containers/string.hpp"
-#include "kernel/tty/display.hpp"
+#include "containers/string.hpp"
+#include "tty/display.hpp"
 
 namespace tty {
 

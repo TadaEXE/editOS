@@ -1,0 +1,10 @@
+set(MODULE_NAME "app_editor")
+
+set(MODULE_SOURCES
+    "${CMAKE_CURRENT_LIST_DIR}/editor.cpp"
+)
+
+set(MODULE_INCLUDE_DIRS
+    "${CMAKE_CURRENT_LIST_DIR}"
+)
+

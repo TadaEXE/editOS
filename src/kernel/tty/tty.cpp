@@ -1,10 +1,10 @@
-#include "kernel/tty/tty.hpp"
+#include "tty/tty.hpp"
 
 #include <string_view>
 
 #include "hal/keyboard.hpp"
 #include "input/keymap.hpp"
-#include "kernel/containers/string.hpp"
+#include "containers/string.hpp"
 
 namespace tty {
 

@@ -3,8 +3,8 @@
 #include <cstddef>
 #include <cstring>
 
-#include "kernel/memory/heap.hpp"
-#include "kernel/panic.hpp"
+#include "memory/heap.hpp"
+#include "panic.hpp"
 #include "math/bit_logic.hpp"
 
 namespace ctr {

@@ -3,13 +3,13 @@
 #include "gfx/canvas.hpp"
 #include "gfx/shapes.hpp"
 #include "gfx/text/text.hpp"
-#include "hal/boot.hpp"
 #include "hal/keyboard.hpp"
-#include "kernel/log.hpp"
-#include "kernel/memory/byte_conversion.hpp"
-#include "kernel/panic.hpp"
-#include "kernel/shell/shell.hpp"
-#include "kernel/tty/tty.hpp"
+#include "hal/boot.hpp"
+#include "log.hpp"
+#include "memory/byte_conversion.hpp"
+#include "panic.hpp"
+#include "shell/shell.hpp"
+#include "tty/tty.hpp"
 #include "logging/backend/serial.hpp"
 #include "logging/logging.hpp"
 #include "ui/core/text_area.hpp"
@@ -62,7 +62,7 @@ logging::backend::LoggingSink* setup_logging(boot::BootContext& ctx) {
     log_msg("Kernel heap (%d MiB) initialized at %p", 32, ctx.ram_start_addr);
   }
 
-  hal::IFramebuffer* fb = ctx.boot_framebuffer;
+  hal::Framebuffer* fb = ctx.boot_framebuffer;
   if (!fb) { panic("No framebuffer provided by bootloader. Abort!"); }
 
   gfx::Canvas can(*fb);

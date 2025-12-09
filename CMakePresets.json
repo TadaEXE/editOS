@@ -27,7 +27,7 @@
         "ARCH_FAMILY": "x86",
         "ARCH_VARIANT": "i386",
         "TARGET_TRIPLET": "i386-elf",
-        "QEMU-SYSTEM": "i386"
+        "QEMU-SYSTEM": "qemu-system-i386"
       }
     }
   ],

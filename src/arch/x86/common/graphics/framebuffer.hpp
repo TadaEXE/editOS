@@ -5,11 +5,11 @@
 #include "gfx/color.hpp"
 #include "gfx/shapes.hpp"
 #include "hal/framebuffer.hpp"
-#include "kernel/boot/multiboot2.hpp"
+#include "boot/multiboot2.hpp"
 
 namespace x86::graphics {
 
-class Framebuffer : public hal::IFramebuffer {
+class Framebuffer : public hal::Framebuffer {
  public:
   Framebuffer() = default;
 

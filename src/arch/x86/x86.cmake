@@ -1,10 +1,6 @@
 set(X86_ROOT "${CMAKE_CURRENT_LIST_DIR}")
 set(X86_COMMON_DIR "${X86_ROOT}/common")
 
-list(APPEND ARCH_INCLUDE_DIRS
-    ${X86_COMMON_DIR}
-)
-
 list(APPEND ARCH_SOURCES
     ${X86_COMMON_DIR}/graphics/framebuffer.cpp
     ${X86_COMMON_DIR}/input/keyboard.cpp

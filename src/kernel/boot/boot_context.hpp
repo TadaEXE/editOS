@@ -102,7 +102,7 @@ struct BootContext {
   const uintptr_t upper_mem_start{0x100000};
   size_t upper_mem_kb;
 
-  hal::IFramebuffer* boot_framebuffer;
+  hal::Framebuffer* boot_framebuffer;
   hal::SerialBus* system_serial_bus;
 
   // Physical memory layout

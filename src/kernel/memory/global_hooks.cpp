@@ -1,5 +1,5 @@
-#include "kernel/memory/heap.hpp"
-#include "kernel/panic.hpp"
+#include "memory/heap.hpp"
+#include "panic.hpp"
 
 void* operator new(size_t sz) {
   if (void* p = mem::alloc(sz)) { return p; }

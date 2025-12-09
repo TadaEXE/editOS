@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include "kernel/containers/flatmap.hpp"
+#include "containers/flatmap.hpp"
 
 namespace mb2 {
 
