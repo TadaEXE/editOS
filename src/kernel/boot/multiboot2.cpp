@@ -1,7 +1,6 @@
 #include "boot/multiboot2.hpp"
 
 #include <cstdint>
-#include <cstring>
 
 namespace mb2 {
 
@@ -32,7 +31,6 @@ ctr::FlatMap<TagType, TagHeader*, TAG_COUNT>& get_tag_map(
 bool get_cmdline(const char** cmdline, uint32_t mb2_info_addr) {
   StringOnlyTag* sot;
   if (load_tag<TagType::Cmdline, StringOnlyTag>(&sot, mb2_info_addr)) {
-    log_msg("get_bl: %s", sot->str);
     *cmdline = sot->str;
     return true;
   }
@@ -44,7 +42,6 @@ bool get_cmdline(const char** cmdline, uint32_t mb2_info_addr) {
 bool get_bootloader_name(const char** bootloader_name, uint32_t mb2_info_addr) {
   StringOnlyTag* sot;
   if (load_tag<TagType::BootloaderName, StringOnlyTag>(&sot, mb2_info_addr)) {
-    log_msg("get_bl: %s", sot->str);
     *bootloader_name = sot->str;
     return true;
   }

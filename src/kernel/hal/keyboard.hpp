@@ -244,7 +244,6 @@ class Keyboard {
  public:
   virtual ~Keyboard() = default;
   virtual bool poll(KeyEvent& ev) noexcept = 0;
-  static Keyboard& get() noexcept;
 };
 
 }  // namespace hal

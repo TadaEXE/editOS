@@ -72,7 +72,9 @@ endforeach()
 # Kernel sources (core only – modules come via add_kernel_module/add_module)
 # ----------------------------------------------------------------------
 set(KERNEL_SOURCES
-    "${CMAKE_SOURCE_DIR}/src/kernel/main.cpp"
+    "${CMAKE_SOURCE_DIR}/src/kernel/kernel.cpp"
+
+    "${CMAKE_SOURCE_DIR}/src/kernel/drv/global_core.cpp"
 
     "${CMAKE_SOURCE_DIR}/src/kernel/panic/panic_impl.cpp"
 
@@ -111,6 +113,7 @@ endif()
 target_link_options(kernel PRIVATE
     -nostdlib
     -lgcc
+    -z noexecstack
     -Wl,-T,${ARCH_LINKER_SCRIPT}
     -Wl,-N
 )

@@ -1,13 +1,16 @@
+#include "kernel.hpp"
+
 #include <cstring>
 
 #include <kernel/log.hpp>
 #include <kernel/panic.hpp>
 
+#include "boot/boot_context.hpp"
+#include "boot/multiboot2.hpp"
 #include "gfx/canvas.hpp"
 #include "gfx/shapes.hpp"
-#include "gfx/text/text.hpp"
+#include "gfx/text/textrenderer.hpp"
 #include "hal/boot.hpp"
-#include "hal/keyboard.hpp"
 #include "logging/backend/serial.hpp"
 #include "logging/logging.hpp"
 #include "memory/byte_conversion.hpp"
@@ -17,7 +20,7 @@
 #include "ui/core/window.hpp"
 #include "ui/tty/tty_text_area.hpp"
 
-namespace {
+namespace kernel {
 bool kernel_fuse() {
   static bool fuse{false};
   if (fuse) {
@@ -27,9 +30,9 @@ bool kernel_fuse() {
   return true;
 }
 
-logging::backend::LoggingSink* setup_logging(boot::BootContext& ctx) {
-  if (ctx.system_serial_bus) {
-    static logging::backend::SerialSink serial_sink(*ctx.system_serial_bus);
+logging::backend::LoggingSink* setup_logging(KernelServices& serv) {
+  if (serv.serial) {
+    static logging::backend::SerialSink serial_sink(*serv.serial);
     log_msg("");
     log_msg("");
     log_msg("");
@@ -38,19 +41,20 @@ logging::backend::LoggingSink* setup_logging(boot::BootContext& ctx) {
   return nullptr;
 }
 
-}  // namespace
-
-[[noreturn]] void hal::enter_kernel(boot::BootContext& ctx) {
+[[noreturn]] void Kernel::enter() {
   if (!kernel_fuse()) panic("Entry fuse blew");
-  logging::backend::set_sink(setup_logging(ctx));
+  logging::backend::set_sink(setup_logging(services));
+  auto& map = mb2::get_tag_map();
+  for (size_t i = 0; i < map.size(); ++i) {
+    auto& e = map.data[i];
+    log_msg("%x = k:%x v:%p (Tagsize: %x)", i, static_cast<uint32_t>(e.key), e.value,
+            e.value->size);
+  }
 
   log_msg("editOS kernel entered...");
   log_msg("Booted by %s", ctx.bootloader_name);
   log_msg("Bootoptions: %s", ctx.cmdline);
   log_msg("%d KiB available in upper memory", ctx.upper_mem_kb);
-  log_msg("Kernel size %d MiB (~%d%%)",
-          mem::KiB_to_MiB(ctx.ram_start_addr - ctx.upper_mem_start),
-          ((ctx.ram_start_addr - ctx.upper_mem_start) * 100) / ctx.upper_mem_kb);
 
   if (ctx.memory_map && ctx.memory_regions) {
     log_msg("Found memory map (%d entries):", ctx.memory_regions);
@@ -63,25 +67,28 @@ logging::backend::LoggingSink* setup_logging(boot::BootContext& ctx) {
     log_msg("Kernel heap (%d MiB) initialized at %p", 32, ctx.ram_start_addr);
   }
 
-  hal::Framebuffer* fb = ctx.boot_framebuffer;
+  hal::Framebuffer* fb = services.framebuffer;
   if (!fb) { panic("No framebuffer provided by bootloader. Abort!"); }
+  log_msg("Got frame buffer %o", fb);
 
   gfx::Canvas can(*fb);
   can.clear(0xFF202040);
 
-  auto& kb = hal::Keyboard::get();
+  auto* kb = services.keyboard;
+  if (!kb) { panic("No keyboard provided by bootloader. Abort!"); }
   gfx::Rect tty_rect{0, 0, can.width(), can.height()};
-  tty_rect -= 10;
 
   ui::Window tty_win{tty_rect};
   tty_win.draw(can);
 
-  gfx::text::Style style{gfx::Color::Black(), gfx::Color::White(), false, 1, -2, 1};
-  ui::TextArea tty_area{tty_rect, can, style};
+  gfx::text::Style style{gfx::Color::Black(), gfx::Color::White(), false, 1, 1, 1};
+  gfx::text::TextRenderer tr{can, style};
+  ui::TextArea tty_area{tty_rect, tr, style};
   ui::TtyTextArea tty_display(tty_area);
-  tty::Tty tty{tty_display, kb};
+  tty::Tty tty{tty_display, *kb};
   shell::Shell shell{tty};
   shell.register_builtin_commands();
 
   shell.run();
 }
+}  // namespace kernel

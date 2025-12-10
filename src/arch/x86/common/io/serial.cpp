@@ -1,6 +1,6 @@
 #include "x86/common/io/serial.hpp"
 
-#include "hal/serial.hpp"
+// #include "hal/serial.hpp"
 
 namespace x86::io {
 

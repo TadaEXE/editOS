@@ -2,10 +2,8 @@
 
 #include <cstdint>
 
-#include "gfx/color.hpp"
-#include "gfx/shapes.hpp"
-#include "hal/framebuffer.hpp"
 #include "boot/multiboot2.hpp"
+#include "hal/framebuffer.hpp"
 
 namespace x86::graphics {
 
@@ -30,12 +28,19 @@ class Framebuffer : public hal::Framebuffer {
     return addr != nullptr && bpp == 32 && width > 0 && height > 0 && pitch >= width * 4;
   }
 
-  void clear(gfx::Color color, gfx::Rect area = gfx::Rect::Empty()) noexcept override;
-  void put_pixel(uint32_t x, uint32_t y, gfx::Color color) noexcept override;
-
   uint32_t get_width() const noexcept override { return width; }
 
   uint32_t get_height() const noexcept override { return height; }
+
+  uint32_t get_bpp() const noexcept override { return bpp; }
+
+  uint32_t get_pitch() const noexcept override { return pitch; }
+
+  uint8_t get_type() const noexcept override {return type_fb; }
+
+  uint8_t* begin() noexcept override { return addr; }
+
+  uint8_t* end() noexcept override { return addr + pitch * height; }
 
  private:
   uint8_t* addr{nullptr};

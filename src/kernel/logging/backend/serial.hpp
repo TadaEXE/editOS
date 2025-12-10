@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdarg>
 
+#include "drv/serial/serial.hpp"
 #include "hal/serial.hpp"
 #include "logging/logging.hpp"
 
@@ -13,12 +14,14 @@ class SerialSink final : public LoggingSink {
   SerialSink& operator=(const SerialSink&) = delete;
   SerialSink& operator=(SerialSink&&) = delete;
 
-  explicit SerialSink(hal::SerialBus& serial) : serial(serial) {}
+  explicit SerialSink(drv::serial::Port& serial) : serial(serial) {}
 
-  void put_char(char c) const noexcept override { serial.write_char(c); }
+  void put_char(char c) const noexcept override {
+    serial.write_byte(static_cast<uint8_t>(c));
+  }
 
  private:
-  hal::SerialBus& serial;
+  drv::serial::Port& serial;
 };
 
 }  // namespace logging::backend

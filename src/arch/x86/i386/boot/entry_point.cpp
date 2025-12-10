@@ -1,29 +1,51 @@
 #include <cstdint>
+#include <cstring>
 #include <iterator>
 
-#include <kernel/log.hpp>
+// #include <kernel/log.hpp>
 #include <kernel/panic.hpp>
 
+#include "board/serial_desc.hpp"
 #include "boot/boot_context.hpp"
+#include "drv/global_core.hpp"
 #include "hal/boot.hpp"
 #include "hal/serial.hpp"
+#include "kernel.hpp"
 #include "memory/builtin/bm_heap.hpp"
 #include "memory/heap.hpp"
+#include "x86/common/board/pc_devices.hpp"
+#include "x86/common/drv/register.hpp"
 #include "x86/common/graphics/framebuffer.hpp"
+#include "x86/common/input/keyboard.hpp"
 
 using namespace x86;
 
 // 4K aligned address after kernel
 extern "C" char _ld_kernel_end_addr;
 
-void setup_boot_fb(boot::BootContext& ctx) {
+inline ::drv::serial::Port* find_console(::drv::GlobalCore& core) noexcept {
+  using DescEntry = ::drv::GlobalCore::DescEntry;
+
+  ::drv::serial::Port* p = core.find_if<::drv::serial::Port>(
+      [](const DescEntry& de, void* iface, ::drv::DriverBase*) {
+        (void)iface;
+        if (de.type != ::drv::TypeTag::of<board::SerialDesc>()) { return false; }
+        auto* sd = static_cast<const board::SerialDesc*>(de.ptr);
+        if (!sd->name) { return false; }
+        return std::strncmp(sd->name, "com1", 4) == 0;
+      });
+
+  return p;
+}
+
+void setup_boot_fb(kernel::KernelServices& kserv) {
   mb2::FramebufferTag fb_tag{};
   static graphics::Framebuffer boot_fb;
 
   if (mb2::load_tag<mb2::TagType::Framebuffer>(fb_tag)) {
     boot_fb = graphics::Framebuffer(fb_tag);
 
-    if (boot_fb.valid()) { ctx.boot_framebuffer = &boot_fb; }
+    if (boot_fb.valid()) { kserv.framebuffer = &boot_fb; }
   }
 }
 
@@ -89,37 +111,46 @@ void make_basic_mem(boot::BootContext& ctx) {
 }
 
 extern "C" void kmain(uint32_t mb2_info_addr) {
+  auto& core = ::drv::core();
+
   boot::BootContext ctx{};
+  kernel::KernelServices serv{};
+
   ctx.arch = boot::ArchKind::X86;
   ctx.bootloader = boot::BootLoaderKind::Multiboot2;
-  ctx.system_serial_bus = hal::SerialBus::get(hal::SerialPort::SYSTEM_RESERVED);
 
   // preload all tags:
-  auto& map = mb2::get_tag_map(mb2_info_addr);
+  (void)mb2::get_tag_map(mb2_info_addr);
 
-  setup_boot_fb(ctx);
+  board::pc::register_board_devices(core);
+  x86::drv::register_arch_drivers(core);
+  core.bind_all();
+
+  serv.keyboard = &x86::input::PS2Keyboard::get_instance();
+  serv.serial = find_console(core);
+  serv.serial->init();
+
+  setup_boot_fb(serv);
   make_basic_mem(ctx);
   make_mem_map(ctx);
   ctx.ram_start_addr = reinterpret_cast<uintptr_t>(&_ld_kernel_end_addr);
-  auto* kernel_heap = mem::get_heap<mem::builtin::BmHeap>();
-  mem::init_heap(kernel_heap, ctx.ram_start_addr, 32 * mem::MiB);
-  mem::set_kernel_heap(*kernel_heap);
-
   const char* str;
-  if (mb2::get_cmdline(&str))
+  if (mb2::get_cmdline(&str)) {
     ctx.cmdline = str;
-  else
+  } else {
     ctx.cmdline = "<none>";
-
+  }
   if (mb2::get_bootloader_name(&str))
     ctx.bootloader_name = str;
   else
     ctx.bootloader_name = "Unknown";
 
-  hal::enter_kernel(ctx);
-  for (size_t i = 0; i < map.size(); ++i) {
-    auto& e = map.data[i];
-    log_msg("%x = k:%x v:%p", i, static_cast<uint32_t>(e.key), e.value);
-  }
+  ctx.ram_start_addr = 0x150000;
+  auto* kernel_heap = mem::get_heap<mem::builtin::BmHeap>();
+  mem::init_heap(kernel_heap, ctx.ram_start_addr, 32 * mem::MiB);
+  mem::set_kernel_heap(*kernel_heap);
+
+  kernel::Kernel kernel{serv, ctx};
+  kernel.enter();
   panic("Unexpected kernel termination. %u", 1);
 }

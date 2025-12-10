@@ -85,9 +85,3 @@ bool PS2Keyboard::poll(hal::KeyEvent& ev) noexcept {
   return true;
 }
 }  // namespace x86::input
-
-namespace hal {
-Keyboard& Keyboard::get() noexcept {
-  return x86::input::PS2Keyboard::get_instance();
-}
-}  // namespace hal

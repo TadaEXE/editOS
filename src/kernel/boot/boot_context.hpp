@@ -96,14 +96,12 @@ struct BootContext {
   ArchKind arch;
   BootLoaderKind bootloader;
   const char* bootloader_name;
+  size_t bootloader_name_len;
   const char* cmdline;
 
   // Basic memory
   const uintptr_t upper_mem_start{0x100000};
   size_t upper_mem_kb;
-
-  hal::Framebuffer* boot_framebuffer;
-  hal::SerialBus* system_serial_bus;
 
   // Physical memory layout
   size_t memory_regions = 0;
