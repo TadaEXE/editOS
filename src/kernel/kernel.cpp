@@ -21,13 +21,10 @@
 #include "ui/tty/tty_text_area.hpp"
 
 namespace kernel {
-bool kernel_fuse() {
+void kernel_fuse_set() {
   static bool fuse{false};
-  if (fuse) {
-    log_msg("Tried to enter kernel (hal::enter_kernel()) more than once!");
-    return false;
-  }
-  return true;
+  if (fuse) { panic("Tried to enter kernel more than once!"); }
+  fuse = true;
 }
 
 logging::backend::LoggingSink* setup_logging(KernelServices& serv) {
@@ -42,7 +39,8 @@ logging::backend::LoggingSink* setup_logging(KernelServices& serv) {
 }
 
 [[noreturn]] void Kernel::enter() {
-  if (!kernel_fuse()) panic("Entry fuse blew");
+  kernel_fuse_set();
+
   logging::backend::set_sink(setup_logging(services));
   auto& map = mb2::get_tag_map();
   for (size_t i = 0; i < map.size(); ++i) {

@@ -1,9 +1,8 @@
 #include "x86/i386/memory/paging.hpp"
 
-#include <cstdarg>
 #include <cstring>
 
-#include <stdio.h>
+#include <cstdio>
 
 #include "hal/paging.hpp"
 
